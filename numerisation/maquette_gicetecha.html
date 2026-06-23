@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>GICETECHA — Maquette (Web + Mobile)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet" />
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone@7/babel.min.js"></script>
+<style>
+  :root{
+    --bg:#F8FAFC; --surface:#FFFFFF; --ink:#1E293B; --ink2:#475569; --ink3:#94A3B8;
+    --blue:#2563EB; --blue-700:#1D4ED8; --blue-bright:#3B82F6; --blue-100:#DBEAFE; --blue-50:#EFF6FF;
+    --green:#16A34A; --green-50:#E7F6EC; --line:#E2E8F0; --slate:#0F172A;
+    --ok:#16A34A; --ok-bg:#DCFCE7; --warn:#B45309; --warn-bg:#FEF3C7;
+    --info:#1D4ED8; --info-bg:#EFF6FF; --danger:#DC2626; --danger-bg:#FEE2E2;
+    --neutral:#64748B; --neutral-bg:#F1F5F9; --amber:#D97706;
+    --shadow:0 12px 32px rgba(15,23,42,.12); --shadow-sm:0 1px 2px rgba(15,23,42,.06);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);font-family:Inter,sans-serif;color:var(--ink);-webkit-font-smoothing:antialiased}
+  h1,h2,h3{font-family:'Outfit',sans-serif;letter-spacing:-.02em;margin:0}
+  button{font-family:inherit;cursor:pointer;border:none;background:none}
+  ::-webkit-scrollbar{width:8px;height:8px}::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:8px}
+  .hov{transition:all .16s ease}
+  .card-hov:hover{transform:translateY(-4px);box-shadow:var(--shadow)}
+  .nav-it:hover{background:rgba(255,255,255,.07)}
+  .btn-blue:hover{background:var(--blue-700);transform:translateY(-2px)}
+  .lift:hover{box-shadow:var(--shadow-sm);border-color:var(--blue-bright)!important}
+  .phone-shell{box-shadow:0 30px 60px rgba(15,23,42,.28)}
+  .fade{animation:fade .3s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  @media(max-width:780px){.login-hero{display:none!important}.login-grid{grid-template-columns:1fr!important;max-width:440px!important}}
+  .pop{animation:pop .22s ease}@keyframes pop{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel" data-presets="react">
+const {useState} = React;
+
+/* ============================ ICONS ============================ */
+const Ic=({d,size=20,sw=1.9,fill="none",style})=>(
+  <svg width={size} height={size} viewBox="0 0 24 24" fill={fill} stroke="currentColor"
+    strokeWidth={sw} strokeLinecap="round" strokeLinejoin="round" style={style}>{d}</svg>);
+const I={
+  grid:(p)=><Ic {...p} d={<><rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="8" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/><rect x="13" y="13" width="8" height="8" rx="1.5"/></>}/>,
+  leaf:(p)=><Ic {...p} d={<><path d="M11 20A7 7 0 0 1 4 13c0-5 4-9 16-9 0 8-4 13-9 13Z"/><path d="M4 20c2-5 5-7 9-8"/></>}/>,
+  coins:(p)=><Ic {...p} d={<><ellipse cx="8" cy="7" rx="5" ry="2.6"/><path d="M3 7v5c0 1.4 2.2 2.6 5 2.6s5-1.2 5-2.6V7"/><path d="M13 12.5c.6 1 2.6 1.8 4.5 1.8 2.8 0 5-1.2 5-2.6V7c0-1.4-2.2-2.6-5-2.6-1.4 0-2.7.3-3.6.8"/></>}/>,
+  chart:(p)=><Ic {...p} d={<><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></>}/>,
+  clip:(p)=><Ic {...p} d={<><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2M9 11h6M9 15h4"/></>}/>,
+  cart:(p)=><Ic {...p} d={<><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/><path d="M2 3h3l2.4 12.4a1 1 0 0 0 1 .8h8.7a1 1 0 0 0 1-.8L21 7H6"/></>}/>,
+  box:(p)=><Ic {...p} d={<><path d="M3 7.5 12 3l9 4.5v9L12 21 3 16.5z"/><path d="M3 7.5 12 12l9-4.5M12 12v9"/></>}/>,
+  store:(p)=><Ic {...p} d={<><path d="M4 9V5h16v4M4 9l-1 0a1 1 0 0 1 .1-2L5 4h14l1.9 3a1 1 0 0 1 .1 2h-1M4 9c0 1.4 1 2 2 2s2-.6 2-2c0 1.4 1 2 2 2s2-.6 2-2c0 1.4 1 2 2 2s2-.6 2-2c0 1.4 1 2 2 2"/><path d="M5 11v9h14v-9M9 20v-5h6v5"/></>}/>,
+  receipt:(p)=><Ic {...p} d={<><path d="M5 3v18l2-1.5L9 21l2-1.5L13 21l2-1.5L17 21l2-1.5V3l-2 1.5L15 3l-2 1.5L11 3 9 4.5 7 3z"/><path d="M8 8h8M8 12h6"/></>}/>,
+  plus:(p)=><Ic {...p} d={<path d="M12 5v14M5 12h14"/>}/>,
+  check:(p)=><Ic {...p} d={<path d="m5 12 4.5 4.5L19 7"/>}/>,
+  x:(p)=><Ic {...p} d={<path d="M6 6 18 18M18 6 6 18"/>}/>,
+  arrow:(p)=><Ic {...p} d={<path d="M5 12h14m-6-6 6 6-6 6"/>}/>,
+  chev:(p)=><Ic {...p} d={<path d="m9 6 6 6-6 6"/>}/>,
+  search:(p)=><Ic {...p} d={<><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></>}/>,
+  bell:(p)=><Ic {...p} d={<><path d="M18 8a6 6 0 1 0-12 0c0 7-3 8-3 8h18s-3-1-3-8"/><path d="M10.5 20a2 2 0 0 0 3 0"/></>}/>,
+  logout:(p)=><Ic {...p} d={<><path d="M14 20H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h8"/><path d="M17 15l3-3-3-3M9 12h11"/></>}/>,
+  calendar:(p)=><Ic {...p} d={<><rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 9h18M8 2.5v4M16 2.5v4"/></>}/>,
+  trend:(p)=><Ic {...p} d={<path d="M3 16l5-5 3.5 3.5L20 7m0 0h-5m5 0v5"/>}/>,
+  down:(p)=><Ic {...p} d={<path d="M3 8l5 5 3.5-3.5L20 17m0 0h-5m5 0v-5"/>}/>,
+  user:(p)=><Ic {...p} d={<><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6 8-6s8 2 8 6"/></>}/>,
+  users:(p)=><Ic {...p} d={<><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-5 6-5s6 1.7 6 5"/><path d="M16 5.2A3.2 3.2 0 0 1 16 11M21 20c0-2.6-1.5-4.2-4-4.8"/></>}/>,
+  wallet:(p)=><Ic {...p} d={<><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18M16 14h2"/></>}/>,
+  egg:(p)=><Ic {...p} d={<path d="M12 3c3.5 0 6 5 6 9a6 6 0 0 1-12 0c0-4 2.5-9 6-9Z"/>}/>,
+  syringe:(p)=><Ic {...p} d={<><path d="M18 2l4 4M17 5l2 2M14.5 7.5l2 2M3 21l8.5-8.5M9 9l6 6M6 12l6 6"/></>}/>,
+  wheat:(p)=><Ic {...p} d={<><path d="M12 22V8"/><path d="M12 8c0-2-1.5-3.5-3.5-3.5C8.5 6.5 10 8 12 8Zm0 0c0-2 1.5-3.5 3.5-3.5C15.5 6.5 14 8 12 8Zm0 5c0-2-1.5-3.5-3.5-3.5C8.5 11.5 10 13 12 13Zm0 0c0-2 1.5-3.5 3.5-3.5C15.5 11.5 14 13 12 13Z"/></>}/>,
+  pig:(p)=><Ic {...p} d={<><path d="M4 12a6 6 0 0 1 6-6h2l3-2v3a6 6 0 0 1 5 5l1 .5-1 1.5v3h-3l-1 2h-3l-1-2H8l-1 2H4v-3a6 6 0 0 1 0-6Z"/><circle cx="9" cy="11" r=".6" fill="currentColor"/></>}/>,
+  alert:(p)=><Ic {...p} d={<><path d="M10.3 4 2.7 17.5A1.5 1.5 0 0 0 4 20h16a1.5 1.5 0 0 0 1.3-2.5L13.7 4a1.5 1.5 0 0 0-2.6 0Z"/><path d="M12 9v4M12 16.5v.5"/></>}/>,
+  drop:(p)=><Ic {...p} d={<path d="M12 3s6 6.5 6 10a6 6 0 0 1-12 0c0-3.5 6-10 6-10Z"/>}/>,
+  pin:(p)=><Ic {...p} d={<><path d="M12 21s7-5.4 7-11a7 7 0 1 0-14 0c0 5.6 7 11 7 11Z"/><circle cx="12" cy="10" r="2.5"/></>}/>,
+  wifi:(p)=><Ic {...p} d={<><path d="M5 12.5a10 10 0 0 1 14 0M8 16a5 5 0 0 1 8 0"/><circle cx="12" cy="19.5" r="1" fill="currentColor"/></>}/>,
+  cog:(p)=><Ic {...p} d={<><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1l2-1.5-2-3.4-2.3 1a7 7 0 0 0-1.7-1l-.3-2.6H10.4l-.3 2.6a7 7 0 0 0-1.7 1l-2.3-1-2 3.4L6 11a7 7 0 0 0 0 2l-2 1.5 2 3.4 2.3-1a7 7 0 0 0 1.7 1l.3 2.6h3.2l.3-2.6a7 7 0 0 0 1.7-1l2.3 1 2-3.4-2-1.5a7 7 0 0 0 .1-1z"/></>}/>,
+  layers:(p)=><Ic {...p} d={<><path d="M12 2 2 7l10 5 10-5z"/><path d="m2 12 10 5 10-5M2 17l10 5 10-5"/></>}/>,
+  shield:(p)=><Ic {...p} d={<><path d="M12 3 5 6v5c0 4.4 3 7.6 7 9 4-1.4 7-4.6 7-9V6z"/><path d="m9.2 12 2 2 3.6-4"/></>}/>,
+  mail:(p)=><Ic {...p} d={<><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="m3.5 7 8.5 6 8.5-6"/></>}/>,
+  globe:(p)=><Ic {...p} d={<><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></>}/>,
+  info:(p)=><Ic {...p} d={<><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8v.5"/></>}/>,
+};
+
+/* ============================ DATA ============================ */
+const fcfa=n=>n.toLocaleString('fr-FR')+" FCFA";
+const fk=n=> (n>=1000000?(n/1000000).toLocaleString('fr-FR',{maximumFractionDigits:2})+" M":n.toLocaleString('fr-FR'));
+
+const BANDES=[
+  {id:"B-024", nom:"Poulets de chair", init:210, effectif:200, jour:28, duree:42, mortalite:4.8, statut:"encours", cout:420000, vente:0, seed:"poulet-a"},
+  {id:"B-025", nom:"Pondeuses (test)", init:50, effectif:50, jour:6, duree:120, mortalite:0, statut:"demarrage", cout:95000, vente:0, seed:"poule-c"},
+  {id:"B-023", nom:"Poulets de chair", init:60, effectif:0, jour:42, duree:42, mortalite:6.7, statut:"terminee", cout:165000, vente:340000, seed:"poulet-b"},
+];
+const BSTAT={encours:{l:"En cours",c:"var(--info)",bg:"var(--info-bg)"},demarrage:{l:"Démarrage",c:"var(--warn)",bg:"var(--warn-bg)"},terminee:{l:"Terminée",c:"var(--neutral)",bg:"var(--neutral-bg)"}};
+
+const MOUVEMENTS=[
+  {date:"22 juin", lib:"Vente bande B-023 (52 sujets)", type:"in", montant:340000, cat:"Ventes"},
+  {date:"20 juin", lib:"Achat aliment démarrage", type:"out", montant:85000, cat:"Aliments"},
+  {date:"18 juin", lib:"Achat poussins B-025", type:"out", montant:75000, cat:"Cheptel"},
+  {date:"15 juin", lib:"Vaccination B-024", type:"out", montant:22000, cat:"Santé"},
+  {date:"12 juin", lib:"Vente œufs (8 plateaux)", type:"in", montant:18000, cat:"Ventes"},
+  {date:"08 juin", lib:"Aliment croissance B-024", type:"out", montant:96000, cat:"Aliments"},
+];
+
+const PRODUITS=[
+  {id:1,nom:"Poulet de chair (vif)",unit:"par kg",prix:3500,seed:"chair",stock:200,cat:"Volaille"},
+  {id:2,nom:"Poulet rôti",unit:"pièce",prix:4500,seed:"roti",stock:12,cat:"Transformation"},
+  {id:3,nom:"Œufs — plateau de 30",unit:"plateau",prix:2800,seed:"oeufs",stock:24,cat:"Volaille"},
+  {id:4,nom:"Manioc",unit:"régime",prix:1500,seed:"manioc",stock:40,cat:"Cultures"},
+  {id:5,nom:"Plantain",unit:"régime",prix:2000,seed:"plantain",stock:30,cat:"Cultures"},
+  {id:6,nom:"Miel pur",unit:"pot 500g",prix:3000,seed:"miel",stock:8,cat:"Apiculture"},
+];
+
+const STOCKS=[
+  {nom:"Aliment démarrage",qte:6,unit:"sacs 50kg",seuil:5,bas:false},
+  {nom:"Aliment croissance",qte:3,unit:"sacs 50kg",seuil:5,bas:true},
+  {nom:"Vaccin Newcastle",qte:2,unit:"flacons",seuil:3,bas:true},
+  {nom:"Copeaux (litière)",qte:9,unit:"sacs",seuil:4,bas:false},
+];
+
+/* ============================ UI ============================ */
+const Btn=({children,onClick,full,small,ghost,danger})=>(
+  <button onClick={onClick} className={ghost?"lift hov":"btn-blue hov"} style={{
+    width:full?"100%":"auto",padding:small?"9px 16px":"12px 20px",borderRadius:999,fontWeight:600,fontSize:small?13:14,
+    display:"inline-flex",alignItems:"center",justifyContent:"center",gap:8,
+    background:ghost?"var(--blue-50)":danger?"var(--danger)":"var(--blue)",color:ghost?"var(--blue-700)":"#fff",
+    border:ghost?"1px solid transparent":"none",boxShadow:ghost?"none":"0 8px 18px rgba(37,99,235,.25)"}}>{children}</button>);
+
+const Badge=({m})=> <span style={{background:m.bg,color:m.c,fontSize:11.5,fontWeight:600,padding:"4px 10px",borderRadius:999,whiteSpace:"nowrap"}}>{m.l}</span>;
+
+const Avatar=({name,size=44,green})=>{const ini=name.split(" ").map(w=>w[0]).slice(0,2).join("");
+  return <div style={{width:size,height:size,borderRadius:"50%",flexShrink:0,background:green?"var(--green-50)":"var(--blue-100)",color:green?"var(--green)":"var(--blue-700)",fontWeight:700,display:"flex",alignItems:"center",justifyContent:"center",fontSize:size*.36}}>{ini}</div>;};
+
+const Photo=({seed,h=120,radius=12,label})=>(
+  <div style={{height:h,borderRadius:radius,position:"relative",overflow:"hidden",background:"linear-gradient(135deg,var(--blue-100),#c7d2fe)"}}>
+    <img src={`https://picsum.photos/seed/gic-${encodeURIComponent(seed)}/500/360`} alt="" style={{width:"100%",height:"100%",objectFit:"cover",display:"block"}}/>
+    {label&&<div style={{position:"absolute",left:8,bottom:6,color:"#fff",fontSize:11,fontWeight:600,background:"rgba(15,23,42,.4)",padding:"2px 8px",borderRadius:999}}>{label}</div>}
+  </div>);
+
+const Stat=({icon:Ico,label,value,sub,tone="var(--blue)",down})=>(
+  <div style={{background:"var(--surface)",border:"1px solid var(--line)",borderRadius:18,padding:18,minWidth:0,boxShadow:"var(--shadow-sm)"}}>
+    <span style={{color:tone,background:"var(--blue-50)",borderRadius:12,padding:9,display:"inline-flex"}}><Ico size={18}/></span>
+    <div style={{fontSize:23,fontWeight:800,marginTop:12,letterSpacing:-.5,fontFamily:"'Outfit',sans-serif",color:"var(--ink)"}}>{value}</div>
+    <div style={{color:"var(--ink3)",fontSize:12.5,fontWeight:500,marginTop:2}}>{label}</div>
+    {sub&&<div style={{color:down?"var(--danger)":"var(--green)",fontSize:11.5,marginTop:4,fontWeight:600,display:"inline-flex",alignItems:"center",gap:3}}>{down?<I.down size={13}/>:<I.trend size={13}/>}{sub}</div>}
+  </div>);
+
+const Section=({title,extra,children})=>(
+  <div style={{marginTop:18}}>
+    <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
+      <h3 style={{fontSize:16}}>{title}</h3>{extra}</div>
+    {children}</div>);
+
+const Progress=({value,color="var(--blue)"})=>(
+  <div style={{height:8,borderRadius:999,background:"var(--neutral-bg)",overflow:"hidden"}}>
+    <div style={{width:value+"%",height:"100%",background:color,borderRadius:999}}/></div>);
+
+/* ============================ SCREENS — GÉRANT ============================ */
+function Dashboard({mobile,go}){
+  const acts=[["leaf","Volaille","Actif","var(--green)",true],["pig","Porcs","Phase 2",null,false],["wheat","Cultures","Phase 2",null,false],["store","Transformation","Phase 2",null,false]];
+  return (
+    <div className="fade">
+      <h1 style={{fontSize:26}}>Bonjour, Gildas 👋</h1>
+      <p style={{color:"var(--ink3)",margin:"4px 0 18px",fontSize:14}}>Vue d'ensemble de l'exploitation · mardi 23 juin 2026.</p>
+      <div style={{display:"grid",gridTemplateColumns:mobile?"1fr 1fr":"repeat(4,1fr)",gap:12,marginBottom:16}}>
+        <Stat icon={I.coins} label="Trésorerie nette" value={fk(1250000)} sub="+101 000 ce mois"/>
+        <Stat icon={I.leaf} label="Bandes actives" value="2" sub="250 sujets"/>
+        <Stat icon={I.trend} label="Marge prévis. B-024" value="+38%" sub="cycle en cours"/>
+        <Stat icon={I.drop} label="Mortalité moyenne" value="4,8%" sub="objectif < 6%"/>
+      </div>
+
+      <Section title="Activités de l'exploitation">
+        <div style={{display:"grid",gridTemplateColumns:mobile?"1fr 1fr":"repeat(4,1fr)",gap:12}}>
+          {acts.map(([ic,nom,etat,col,active])=>(
+            <div key={nom} className={active?"card-hov hov":""} onClick={()=>active&&go("Elevage")} style={{background:"var(--surface)",border:"1px solid var(--line)",borderRadius:16,padding:16,opacity:active?1:.6,cursor:active?"pointer":"default",boxShadow:"var(--shadow-sm)"}}>
+              <span style={{color:active?"var(--green)":"var(--ink3)",background:active?"var(--green-50)":"var(--neutral-bg)",borderRadius:12,padding:9,display:"inline-flex"}}>{React.createElement(I[ic],{size:20})}</span>
+              <div style={{fontWeight:700,marginTop:10,fontSize:14.5}}>{nom}</div>
+              <div style={{fontSize:12,fontWeight:600,marginTop:3,color:active?"var(--green)":"var(--ink3)"}}>{etat}</div>
+            </div>))}
+        </div>
+      </Section>
+
+      <div style={{display:"grid",gridTemplateColumns:mobile?"1fr":"1.4fr 1fr",gap:16,marginTop:18}}>
+        <div style={{background:"var(--surface)",border:"1px solid var(--line)",borderRadius:18,padding:18,boxShadow:"var(--shadow-sm)"}}>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:6}}>
+            <strong>Mouvements récents</strong>
+            <button onClick={()=>go("Tresorerie")} style={{color:"var(--blue)",fontWeight:600,fontSize:13,display:"inline-flex",gap:4,alignItems:"center"}}>Trésorerie <I.arrow size={15}/></button></div>
+          {MOUVEMENTS.slice(0,4).map((m,i)=>(
+            <div key={i} style={{display:"flex",alignItems:"center",gap:12,padding:"11px 0",borderBottom:i<3?"1px solid var(--line)":"none"}}>
+              <span style={{width:34,height:34,borderRadius:10,display:"flex",alignItems:"center",justifyContent:"center",background:m.type==="in"?"var(--ok-bg)":"var(--danger-bg)",color:m.type==="in"?"var(--ok)":"var(--danger)"}}>{m.type==="in"?<I.trend size={16}/>:<I.down size={16}/>}</span>
+              <div style={{flex:1,minWidth:0}}><div style={{fontSize:13.5,fontWeight:600,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{m.lib}</div><div style={{fontSize:11.5,color:"var(--ink3)"}}>{m.date} · {m.cat}</div></div>
+              <strong style={{fontSize:13.5,color:m.type==="in"?"var(--ok)":"var(--danger)",whiteSpace:"nowrap"}}>{m.type==="in"?"+":"−"}{fcfa(m.montant)}</strong>
+            </div>))}
+        </div>
+        <div style={{background:"var(--surface)",border:"1px solid var(--line)",borderRadius:18,padding:18,boxShadow:"var(--shadow-sm)"}}>
+          <strong>Profits & pertes — juin</strong>
+          <div style={{marginTop:14}}>
+            <div style={{display:"flex",justifyContent:"space-between",fontSize:13.5,marginBottom:6}}><span style={{color:"var(--ink2)"}}>Revenus</span><b style={{color:"var(--ok)"}}>{fcfa(358000)}</b></div>
+            <Progress value={100} color="var(--ok)"/>
+            <div style={{display:"flex",justifyContent:"space-between",fontSize:13.5,margin:"14px 0 6px"}}><span style={{color:"var(--ink2)"}}>Dépenses</span><b style={{color:"var(--danger)"}}>{fcfa(257000)}</b></div>
+            <Progress value={72} color="var(--danger)"/>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginTop:16,paddingTop:14,borderTop:"1px solid var(--line)"}}>
+              <span style={{fontWeight:700}}>Résultat net</span><span style={{fontWeight:800,fontSize:18,color:"var(--ok)",fontFamily:"'Outfit',sans-serif"}}>+{fcfa(101000)}</span></div>
+          </div>
+        </div>
+      </div>
+    </div>);
+}
+
+function ElevageList({mobile,onOpen,saisie}){
+  return (
+    <div className="fade">
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:10}}>
+        <div><h1 style={{fontSize:26}}>Élevage — Volaille</h1><p style={{color:"var(--ink3)",margin:"4px 0 0",fontSize:14}}>Suivi des bandes (cycles d'élevage).</p></div>
+        <Btn small><I.plus size={16}/>Nouvelle bande</Btn>
+      </div>
+      <div style={{display:"grid",gridTemplateColumns:mobile?"1fr":"repeat(auto-fill,minmax(280px,1fr))",gap:16,marginTop:18}}>
+        {BANDES.map(b=>{const survie=Math.round((b.effectif||b.init*(1-b.mortalite/100))); const prog=Math.round(b.jour/b.duree*100);
+          return (
+          <div key={b.id} onClick={()=>onOpen(b)} className="card-hov hov" style={{background:"var(--surface)",border:"1px solid var(--line)",borderRadius:18,overflow:"hidden",cursor:"pointer",boxShadow:"var(--shadow-sm)"}}>
+            <Photo seed={b.seed} h={120} radius={0} label={b.nom}/>
+            <div style={{padding:15}}>
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                <strong style={{fontSize:15}}>{b.id}</strong><Badge m={BSTAT[b.statut]}/></div>
+              <div style={{display:"flex",gap:14,margin:"12px 0",flexWrap:"wrap"}}>
+                <div><div style={{fontSize:11,color:"var(--ink3)"}}>Effectif</div><b>{b.statut==="terminee"?b.init:b.effectif}/{b.init}</b></div>
+                <div><div style={{fontSize:11,color:"var(--ink3)"}}>Mortalité</div><b style={{color:b.mortalite>6?"var(--danger)":"var(--ink)"}}>{b.mortalite}%</b></div>
+                <div><div style={{fontSize:11,color:"var(--ink3)"}}>Coûts</div><b>{fcfa(b.cout)}</b></div>
+              </div>
+              <div style={{display:"flex",justifyContent:"space-between",fontSize:11.5,color:"var(--ink3)",marginBottom:5}}><span>Jour {b.jour}/{b.duree}</span><span>{prog}%</span></div>
+              <Progress value={prog}/>
+            </div>
+          </div>);})}
+      </div>
+    </div>);
+}
+
+function BandeDetail({b,onBack,mobile}){
+  b=b||BANDES[0];
+  const survie=b.statut==="terminee"?b.init:b.effectif;
+  const entries=[
+    {ic:I.alert,t:"Mortalité",v:"3 sujets",d:"Aujourd'hui · forte chaleur",c:"var(--danger)"},
+    {ic:I.leaf,t:"Alimentation",v:"25 kg",d:"Aujourd'hui · croissance",c:"var(--green)"},
+    {ic:I.syringe,t:"Vaccination",v:"Newcastle",d:"15 juin · rappel",c:"var(--blue)"},
+    {ic:I.coins,t:"Vente",v:"—",d:"Cycle non clôturé",c:"var(--neutral)"},
+  ];
+  return (
+    <div className="fade">
+      <button onClick={onBack} className="hov" style={{color:"var(--blue)",fontWeight:600,fontSize:13,display:"flex",alignItems:"center",gap:6,marginBottom:14}}><I.chev size={16} style={{transform:"rotate(180deg)"}}/>Retour aux bandes</button>
+      <div style={{position:"relative",borderRadius:20,overflow:"hidden"}}><Photo seed={b.seed} h={mobile?130:170} radius={0}/>
+        <div style={{position:"absolute",inset:0,background:"linear-gradient(180deg,transparent,rgba(15,23,42,.6))"}}/>
+        <div style={{position:"absolute",left:18,bottom:14,color:"#fff"}}>
+          <div style={{display:"flex",alignItems:"center",gap:8}}><h1 style={{fontSize:mobile?22:26,color:"#fff"}}>{b.id}</h1><Badge m={BSTAT[b.statut]}/></div>
+          <div style={{fontSize:13,opacity:.9,marginTop:2}}>{b.nom} · démarrée il y a {b.jour} jours</div></div>
+      </div>
+
+      <div style={{display:"grid",gridTemplateColumns:mobile?"1fr 1fr":"repeat(4,1fr)",gap:12,marginTop:16}}>
+        <Stat icon={I.users} label="Effectif vivant" value={survie+" / "+b.init} tone="var(--green)"/>
+        <Stat icon={I.drop} label="Taux mortalité" value={b.mortalite+"%"} tone="var(--danger)"/>
+        <Stat icon={I.coins} label="Coûts cumulés" value={fcfa(b.cout)}/>
+        <Stat icon={I.trend} label="Marge prévis." value={b.statut==="terminee"?"+"+fcfa(b.vente-b.cout):"+38%"}/>
+      </div>
+
+      <div style={{display:"grid",gridTemplateColumns:mobile?"1fr":"1fr 1fr",gap:12,marginTop:16}}>
+        {entries.map((e,i)=>(
+          <div key={i} style={{background:"var(--surface)",border:"1px solid var(--line)",borderRadius:16,padding:15,display:"flex",alignItems:"center",gap:12,boxShadow:"var(--shadow-sm)"}}>
+            <span style={{width:42,height:42,borderRadius:12,display:"flex",alignItems:"center",justifyContent:"center",background:"var(--blue-50)",color:e.c}}><e.ic size={20}/></span>
+            <div style={{flex:1}}><div style={{fontSize:12,color:"var(--ink3)"}}>{e.t}</div><div style={{fontWeight:700,fontSize:15}}>{e.v}</div><div style={{fontSize:11,color:"var(--ink3)"}}>{e.d}</div></div>
+            <button className="lift hov" style={{border:"1px solid var(--line)",borderRadius:10,padding:7,color:"var(--blue)"}}><I.plus size={16}/></button>
+          </div>))}
+      </div>
+    </div>);
+}
+
+function Tresorerie({mobile}){
+  return (
+    <div className="fade">
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:10}}>
+        <div><h1 style={{fontSize:26}}>Trésorerie & Comptabilité</h1><p style={{color:"var(--ink3)",margin:"4px 0 0",fontSize:14}}>Mouvements, profits & pertes.</p></div>
+        <Btn small><I.plus size={16}/>Nouveau mouvement</Btn>
+      </div>
+      <div style={{display:"grid",gridTemplateColumns:mobile?"1fr 1fr":"repeat(3,1fr)",gap:12,margin:"18px 0"}}>
+        <Stat icon={I.coins} label="Solde de trésorerie" value={fk(1250000)}/>
+        <Stat icon={I.trend} label="Revenus (juin)" value={fcfa(358000)} tone="var(--green)"/>
+        <Stat icon={I.down} label="Dépenses (juin)" value={fcfa(257000)} tone="var(--danger)" sub="dont 70% aliments" down/>
+      </div>
+      <div style={{background:"var(--surface)",border:"1px solid var(--line)",borderRadius:18,overflow:"hidden",boxShadow:"var(--shadow-sm)"}}>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"14px 16px",borderBottom:"1px solid var(--line)"}}>
+          <strong>Historique des mouvements</strong>
+          <div style={{display:"flex",gap:6}}>{["Tous","Entrées","Sorties"].map((t,i)=><span key={i} style={{fontSize:12,fontWeight:600,padding:"5px 11px",borderRadius:999,background:i===0?"var(--blue)":"var(--neutral-bg)",color:i===0?"#fff":"var(--ink2)"}}>{t}</span>)}</div>
+        </div>
+        {MOUVEMENTS.map((m,i)=>(
+          <div key={i} style={{display:"flex",alignItems:"center",gap:12,padding:"13px 16px",borderBottom:i<MOUVEMENTS.length-1?"1px solid var(--line)":"none"}}>
+            <span style={{width:36,height:36,borderRadius:10,display:"flex",alignItems:"center",justifyContent:"center",background:m.type==="in"?"var(--ok-bg)":"var(--danger-bg)",color:m.type==="in"?"var(--ok)":"var(--danger)"}}>{m.type==="in"?<I.trend size={16}/>:<I.down size={16}/>}</span>
+            <div style={{flex:1,minWidth:0}}><div style={{fontSize:13.5,fontWeight:600,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{m.lib}</div><div style={{fontSize:11.5,color:"var(--ink3)"}}>{m.date}</div></div>
+            {!mobile&&<span style={{fontSize:11.5,color:"var(--ink2)",background:"var(--neutral-bg)",padding:"3px 9px",borderRadius:999}}>{m.cat}</span>}
+            <strong style={{fontSize:14,color:m.type==="in"?"var(--ok)":"var(--danger)",whiteSpace:"nowrap",minWidth:90,textAlign:"right"}}>{m.type==="in"?"+":"−"}{fcfa(m.montant)}</strong>
+          </div>))}
+      </div>
+    </div>);
+}
+
+function Rapports({mobile}){
+  const bars=[55,70,40,85,62,90];const mois=["Jan","Fév","Mar","Avr","Mai","Jun"];
+  return (
+    <div className="fade">
+      <h1 style={{fontSize:26}}>Rapports</h1>
+      <p style={{color:"var(--ink3)",margin:"4px 0 18px",fontSize:14}}>Indicateurs de performance (KPI). Export PDF / Excel.</p>
+      <div style={{display:"grid",gridTemplateColumns:mobile?"1fr 1fr":"repeat(4,1fr)",gap:12,marginBottom:16}}>
+        <Stat icon={I.coins} label="Chiffre d'affaires (6 mois)" value={fk(1840000)}/>
+        <Stat icon={I.trend} label="Rentabilité moyenne" value="34%"/>
+        <Stat icon={I.leaf} label="Sujets vendus" value="312"/>
+        <Stat icon={I.drop} label="Mortalité globale" value="5,4%"/>
+      </div>
+      <div style={{background:"var(--surface)",border:"1px solid var(--line)",borderRadius:18,padding:18,boxShadow:"var(--shadow-sm)"}}>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}><strong>Résultat net mensuel</strong><Btn small ghost><I.chart size={15}/>Exporter</Btn></div>
+        <div style={{display:"flex",alignItems:"flex-end",gap:mobile?8:16,height:160,marginTop:18}}>
+          {bars.map((b,i)=>(<div key={i} style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:7}}>
+            <div className="hov" style={{width:"100%",height:b+"%",borderRadius:"7px 7px 0 0",background:i===5?"var(--blue)":"var(--blue-100)"}}/>
+            <span style={{fontSize:11,color:"var(--ink3)",fontWeight:600}}>{mois[i]}</span></div>))}
+        </div>
+      </div>
+    </div>);
+}
+
+/* ============================ SCREENS — CO-GÉRANT ============================ */
+function Saisie({mobile}){
+  const cards=[
+    {ic:I.alert,t:"Mortalité",d:"Enregistrer les pertes du jour",c:"var(--danger)",bg:"var(--danger-bg)"},
+    {ic:I.leaf,t:"Alimentation",d:"Quantité d'aliment distribuée",c:"var(--green)",bg:"var(--green-50)"},
+    {ic:I.syringe,t:"Santé",d:"Vaccination ou traitement",c:"var(--blue)",bg:"var(--blue-50)"},
+    {ic:I.coins,t:"Vente",d:"Sortie de sujets / produits",c:"var(--amber)",bg:"var(--warn-bg)"},
+  ];
+  return (
+    <div className="fade">
+      <h1 style={{fontSize:26}}>Saisie du jour</h1>
+      <p style={{color:"var(--ink3)",margin:"4px 0 16px",fontSize:14}}>Bonjour Cécilia — enregistrez rapidement les opérations de terrain.</p>
+      <div style={{display:"flex",alignItems:"center",gap:9,background:"var(--blue-50)",border:"1px solid var(--blue-100)",borderRadius:14,padding:"11px 14px",color:"var(--blue-700)",fontSize:12.5,marginBottom:18}}>
+        <I.wifi size={17}/><span>Mode hors-ligne actif — vos saisies seront synchronisées à la reconnexion.</span></div>
+      <div style={{display:"grid",gridTemplateColumns:mobile?"1fr 1fr":"repeat(2,1fr)",gap:14}}>
+        {cards.map((c,i)=>(
+          <button key={i} className="card-hov hov" style={{textAlign:"left",background:"var(--surface)",border:"1px solid var(--line)",borderRadius:18,padding:18,boxShadow:"var(--shadow-sm)"}}>
+            <span style={{width:46,height:46,borderRadius:13,display:"flex",alignItems:"center",justifyContent:"center",background:c.bg,color:c.c}}><c.ic size={22}/></span>
+            <div style={{fontWeight:700,fontSize:16,marginTop:12}}>{c.t}</div>
+            <div style={{fontSize:12.5,color:"var(--ink3)",marginTop:3}}>{c.d}</div>
+            <div style={{marginTop:14,color:"var(--blue)",fontWeight:600,fontSize:13,display:"inline-flex",alignItems:"center",gap:5}}>Saisir <I.plus size={15}/></div>
+          </button>))}
+      </div>
+      <Section title="Bande active à suivre">
+        <div onClick={()=>{}} style={{background:"var(--surface)",border:"1px solid var(--line)",borderRadius:16,padding:15,display:"flex",alignItems:"center",gap:14,boxShadow:"var(--shadow-sm)"}}>
+          <div style={{width:54,height:54,borderRadius:12,overflow:"hidden",flexShrink:0}}><Photo seed="poulet-a" h={54} radius={0}/></div>
+          <div style={{flex:1}}><strong>B-024 · Poulets de chair</strong><div style={{fontSize:12.5,color:"var(--ink3)",marginTop:2}}>Jour 28/42 · 200 sujets · mortalité 4,8%</div></div>
+          <Badge m={BSTAT.encours}/>
+        </div>
+      </Section>
+    </div>);
+}
+
+function Ventes({mobile}){
+  const v=[
+    {ref:"V-118",cli:"Restaurant Le Manguier",art:"30 poulets vifs",date:"22 juin",montant:105000,statut:"payee"},
+    {ref:"V-117",cli:"Mme Ngono",art:"4 plateaux d'œufs",date:"21 juin",montant:11200,statut:"payee"},
+    {ref:"V-116",cli:"Boutique Essos",art:"15 régimes plantain",date:"20 juin",montant:30000,statut:"attente"},
+  ];
+  return (
+    <div className="fade">
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:10}}>
+        <div><h1 style={{fontSize:26}}>Ventes</h1><p style={{color:"var(--ink3)",margin:"4px 0 0",fontSize:14}}>Enregistrement et suivi des ventes.</p></div>
+        <Btn small><I.plus size={16}/>Nouvelle vente</Btn>
+      </div>
+      <div style={{display:"flex",flexDirection:"column",gap:12,marginTop:18}}>
+        {v.map(x=>(
+          <div key={x.ref} className="lift hov" style={{background:"var(--surface)",border:"1px solid var(--line)",borderRadius:16,padding:15,display:"flex",alignItems:"center",gap:14,flexDirection:mobile?"column":"row",boxShadow:"var(--shadow-sm)"}}>
+            <span style={{width:44,height:44,borderRadius:12,background:"var(--green-50)",color:"var(--green)",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}><I.receipt size={20}/></span>
+            <div style={{flex:1,minWidth:0,width:mobile?"100%":"auto"}}>
+              <div style={{display:"flex",gap:8,alignItems:"center",flexWrap:"wrap"}}><strong>{x.cli}</strong><span style={{color:"var(--ink3)",fontSize:12}}>{x.ref}</span></div>
+              <div style={{fontSize:13,color:"var(--ink2)",marginTop:3}}>{x.art} · {x.date}</div></div>
+            <div style={{textAlign:mobile?"left":"right",display:"flex",flexDirection:mobile?"row":"column",gap:8,alignItems:"center",width:mobile?"100%":"auto",justifyContent:"space-between"}}>
+              <strong>{fcfa(x.montant)}</strong>
+              <Badge m={x.statut==="payee"?{l:"Payée",c:"var(--ok)",bg:"var(--ok-bg)"}:{l:"En attente",c:"var(--warn)",bg:"var(--warn-bg)"}}/></div>
+          </div>))}
+      </div>
+    </div>);
+}
+
+function Stocks({mobile}){
+  return (
+    <div className="fade">
+      <h1 style={{fontSize:26}}>Stocks — Aliments & Intrants</h1>
+      <p style={{color:"var(--ink3)",margin:"4px 0 16px",fontSize:14}}>Entrées/sorties et alertes de stock bas.</p>
+      <div style={{display:"flex",alignItems:"center",gap:9,background:"var(--warn-bg)",border:"1px solid #fcd34d",borderRadius:14,padding:"11px 14px",color:"#92400e",fontSize:12.5,marginBottom:18}}>
+        <I.alert size={17}/><span><b>2 articles en stock bas</b> — pensez à réapprovisionner l'aliment croissance et le vaccin Newcastle.</span></div>
+      <div style={{display:"grid",gridTemplateColumns:mobile?"1fr":"1fr 1fr",gap:12}}>
+        {STOCKS.map((s,i)=>(
+          <div key={i} style={{background:"var(--surface)",border:"1px solid "+(s.bas?"#fcd34d":"var(--line)"),borderRadius:16,padding:15,boxShadow:"var(--shadow-sm)"}}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+              <strong style={{fontSize:14.5}}>{s.nom}</strong>
+              {s.bas?<Badge m={{l:"Stock bas",c:"var(--danger)",bg:"var(--danger-bg)"}}/>:<Badge m={{l:"OK",c:"var(--ok)",bg:"var(--ok-bg)"}}/>}</div>
+            <div style={{display:"flex",alignItems:"baseline",gap:6,margin:"10px 0 8px"}}>
+              <span style={{fontSize:24,fontWeight:800,fontFamily:"'Outfit',sans-serif",color:s.bas?"var(--danger)":"var(--ink)"}}>{s.qte}</span>
+              <span style={{fontSize:12.5,color:"var(--ink3)"}}>{s.unit} · seuil {s.seuil}</span></div>
+            <Progress value={Math.min(100,s.qte/(s.seuil*2)*100)} color={s.bas?"var(--danger)":"var(--green)"}/>
+            <div style={{display:"flex",gap:8,marginTop:12}}><Btn small ghost full><I.plus size={14}/>Entrée</Btn><Btn small ghost full><I.down size={14}/>Sortie</Btn></div>
+          </div>))}
+      </div>
+    </div>);
+}
+
+/* ============================ SCREENS — VENDEUR (CAISSE) ============================ */
+function Caisse({mobile}){
+  const [cart,setCart]=useState([{p:PRODUITS[0],q:2},{p:PRODUITS[2],q:1}]);
+  const add=p=>setCart(c=>{const f=c.find(x=>x.p.id===p.id);return f?c.map(x=>x.p.id===p.id?{...x,q:x.q+1}:x):[...c,{p,q:1}];});
+  const total=cart.reduce((s,x)=>s+x.p.prix*x.q,0);
+  return (
+    <div className="fade">
+      <h1 style={{fontSize:26,marginBottom:14}}>Caisse — Point de vente</h1>
+      <div style={{display:"grid",gridTemplateColumns:mobile?"1fr":"1.6fr 1fr",gap:18}}>
+        <div>
+          <div style={{display:"grid",gridTemplateColumns:mobile?"1fr 1fr":"repeat(3,1fr)",gap:12}}>
+            {PRODUITS.map(p=>(
+              <button key={p.id} onClick={()=>add(p)} className="card-hov hov" style={{textAlign:"left",background:"var(--surface)",border:"1px solid var(--line)",borderRadius:14,overflow:"hidden",boxShadow:"var(--shadow-sm)"}}>
+                <Photo seed={p.seed} h={80} radius={0}/>
+                <div style={{padding:"9px 11px"}}><div style={{fontSize:12.5,fontWeight:600,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{p.nom}</div>
+                  <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginTop:4}}><b style={{fontSize:13}}>{p.prix.toLocaleString('fr-FR')}</b><span style={{color:"var(--blue)"}}><I.plus size={16}/></span></div></div>
+              </button>))}
+          </div>
+        </div>
+        <div style={{background:"var(--surface)",border:"1px solid var(--line)",borderRadius:18,padding:16,height:"fit-content",position:mobile?"static":"sticky",top:10,boxShadow:"var(--shadow-sm)"}}>
+          <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:12}}><I.cart size={19} style={{color:"var(--blue)"}}/><strong>Ticket en cours</strong></div>
+          {cart.map((x,i)=>(
+            <div key={i} style={{display:"flex",alignItems:"center",gap:10,padding:"9px 0",borderBottom:"1px solid var(--line)"}}>
+              <div style={{flex:1,minWidth:0}}><div style={{fontSize:13,fontWeight:600,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{x.p.nom}</div><div style={{fontSize:11.5,color:"var(--ink3)"}}>{x.q} × {x.p.prix.toLocaleString('fr-FR')}</div></div>
+              <b style={{fontSize:13}}>{(x.p.prix*x.q).toLocaleString('fr-FR')}</b></div>))}
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginTop:14}}>
+            <span style={{color:"var(--ink3)",fontSize:13}}>Total</span><span style={{fontSize:22,fontWeight:800,fontFamily:"'Outfit',sans-serif"}}>{fcfa(total)}</span></div>
+          <div style={{marginTop:14}}><Btn full><I.check size={17}/>Encaisser</Btn></div>
+        </div>
+      </div>
+    </div>);
+}
+
+/* ============================ SCREENS — CLIENT (BOUTIQUE) ============================ */
+function Boutique({mobile,go}){
+  return (
+    <div className="fade">
+      <div style={{background:"linear-gradient(120deg,#0F172A,#16A34A)",borderRadius:22,padding:mobile?"22px 18px":"32px 28px",color:"#fff",position:"relative",overflow:"hidden",marginBottom:18}}>
+        <div style={{position:"absolute",right:-10,top:-10,opacity:.16}}><I.leaf size={mobile?130:190}/></div>
+        <div style={{position:"relative"}}>
+          <span style={{background:"rgba(255,255,255,.18)",padding:"5px 12px",borderRadius:999,fontWeight:600,fontSize:12,display:"inline-flex",alignItems:"center",gap:6}}><I.leaf size={14}/>Produits fermiers · Cameroun</span>
+          <h1 style={{fontSize:mobile?23:32,margin:"12px 0 6px"}}>Frais de la ferme GICETECHA</h1>
+          <p style={{color:"#d1fae5",fontSize:14,maxWidth:420,margin:0}}>Volaille, œufs, miel et produits vivriers — directement du producteur.</p>
+        </div>
+      </div>
+      <div style={{display:"grid",gridTemplateColumns:mobile?"1fr 1fr":"repeat(3,1fr)",gap:16}}>
+        {PRODUITS.map(p=>(
+          <div key={p.id} className="card-hov hov" style={{background:"var(--surface)",border:"1px solid var(--line)",borderRadius:16,overflow:"hidden",boxShadow:"var(--shadow-sm)"}}>
+            <Photo seed={p.seed} h={mobile?110:150} radius={0} label={p.cat}/>
+            <div style={{padding:14}}>
+              <strong style={{fontSize:14.5}}>{p.nom}</strong>
+              <div style={{fontSize:12,color:"var(--ink3)",marginTop:2}}>{p.unit}</div>
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginTop:12}}>
+                <b style={{fontSize:16}}>{p.prix.toLocaleString('fr-FR')}<span style={{fontSize:11,color:"var(--ink3)",fontWeight:500}}> FCFA</span></b>
+                <button onClick={()=>go("Panier")} className="btn-blue hov" style={{background:"var(--blue)",color:"#fff",borderRadius:10,padding:"8px 10px",display:"inline-flex",alignItems:"center",gap:5,fontSize:12.5,fontWeight:600}}><I.cart size={15}/></button></div>
+            </div>
+          </div>))}
+      </div>
+    </div>);
+}
+
+function Panier({mobile}){
+  const items=[{p:PRODUITS[0],q:3},{p:PRODUITS[2],q:2},{p:PRODUITS[5],q:1}];
+  const total=items.reduce((s,x)=>s+x.p.prix*x.q,0);
+  return (
+    <div className="fade" style={{maxWidth:680,margin:"0 auto"}}>
+      <h1 style={{fontSize:26,marginBottom:14}}>Mon panier</h1>
+      <div style={{background:"var(--surface)",border:"1px solid var(--line)",borderRadius:18,padding:8,boxShadow:"var(--shadow-sm)"}}>
+        {items.map((x,i)=>(
+          <div key={i} style={{display:"flex",alignItems:"center",gap:12,padding:12,borderBottom:i<items.length-1?"1px solid var(--line)":"none"}}>
+            <div style={{width:56,height:56,borderRadius:12,overflow:"hidden",flexShrink:0}}><Photo seed={x.p.seed} h={56} radius={0}/></div>
+            <div style={{flex:1,minWidth:0}}><div style={{fontWeight:600,fontSize:14}}>{x.p.nom}</div><div style={{fontSize:12,color:"var(--ink3)"}}>{x.p.prix.toLocaleString('fr-FR')} / {x.p.unit}</div></div>
+            <div style={{display:"flex",alignItems:"center",gap:8}}>
+              <button className="lift hov" style={{border:"1px solid var(--line)",borderRadius:8,width:28,height:28,display:"flex",alignItems:"center",justifyContent:"center"}}>−</button>
+              <b style={{minWidth:18,textAlign:"center"}}>{x.q}</b>
+              <button className="lift hov" style={{border:"1px solid var(--line)",borderRadius:8,width:28,height:28,display:"flex",alignItems:"center",justifyContent:"center"}}>+</button></div>
+          </div>))}
+      </div>
+      <div style={{background:"var(--surface)",border:"1px solid var(--line)",borderRadius:18,padding:18,marginTop:14,boxShadow:"var(--shadow-sm)"}}>
+        <div style={{display:"flex",justifyContent:"space-between",fontSize:13.5,marginBottom:8}}><span style={{color:"var(--ink2)"}}>Sous-total</span><b>{fcfa(total)}</b></div>
+        <div style={{display:"flex",justifyContent:"space-between",fontSize:13.5,marginBottom:12}}><span style={{color:"var(--ink2)"}}>Livraison (Yaoundé)</span><b>1 500 FCFA</b></div>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",paddingTop:12,borderTop:"1px solid var(--line)"}}>
+          <span style={{fontWeight:700}}>Total</span><span style={{fontSize:20,fontWeight:800,fontFamily:"'Outfit',sans-serif"}}>{fcfa(total+1500)}</span></div>
+        <div style={{marginTop:14}}><Btn full>Commander · Mobile Money <I.arrow size={17}/></Btn></div>
+      </div>
+    </div>);
+}
+
+function Commandes({mobile}){
+  const cmds=[
+    {ref:"#CMD-1042",art:"3 poulets vifs · 2 plateaux œufs",date:"22 juin",montant:14100,statut:"Livrée",c:"var(--ok)",bg:"var(--ok-bg)"},
+    {ref:"#CMD-1031",art:"1 pot de miel · 5 régimes plantain",date:"14 juin",montant:13000,statut:"En préparation",c:"var(--warn)",bg:"var(--warn-bg)"},
+  ];
+  return (
+    <div className="fade" style={{maxWidth:680,margin:"0 auto"}}>
+      <h1 style={{fontSize:26,marginBottom:14}}>Mes commandes</h1>
+      <div style={{display:"flex",flexDirection:"column",gap:12}}>
+        {cmds.map(c=>(
+          <div key={c.ref} className="lift hov" style={{background:"var(--surface)",border:"1px solid var(--line)",borderRadius:16,padding:16,boxShadow:"var(--shadow-sm)"}}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:8}}>
+              <strong>{c.ref}</strong><Badge m={{l:c.statut,c:c.c,bg:c.bg}}/></div>
+            <div style={{fontSize:13,color:"var(--ink2)",margin:"8px 0"}}>{c.art}</div>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",borderTop:"1px solid var(--line)",paddingTop:10}}>
+              <span style={{fontSize:12.5,color:"var(--ink3)"}}>{c.date}</span><b>{fcfa(c.montant)}</b></div>
+          </div>))}
+      </div>
+    </div>);
+}
+
+/* ============================ MODULES (feuille de route) ============================ */
+const MODULES=[
+  {ph:"Phase 1 — Démarrage (An 0–3)",items:[
+    {n:"M1",t:"Élevage volaille (Poulets)",ic:"leaf",prio:"Haute (MVP)",actif:true},
+    {n:"M2",t:"Comptabilité & Trésorerie",ic:"coins",prio:"Haute (MVP)",actif:true}]},
+  {ph:"Phase 2 — Diversification (An 4–10)",items:[
+    {n:"M3",t:"Élevage Porcs",ic:"pig",prio:"Moyenne",actif:false},
+    {n:"M4",t:"Cultures vivrières",ic:"wheat",prio:"Moyenne",actif:false},
+    {n:"M5",t:"Stocks (Aliments & Intrants)",ic:"box",prio:"Moyenne",actif:false},
+    {n:"M6",t:"Points de vente & Transformation",ic:"store",prio:"Moyenne",actif:false}]},
+  {ph:"Phase 3 — Consolidation (An 11–20)",items:[
+    {n:"M7",t:"Gestion du personnel (RH)",ic:"users",prio:"Basse",actif:false},
+    {n:"M8",t:"Clients & Fournisseurs (CRM)",ic:"user",prio:"Basse",actif:false},
+    {n:"M9",t:"Cacao & Agroforesterie",ic:"leaf",prio:"Basse",actif:false},
+    {n:"M10",t:"Marques & Marketing (e-commerce)",ic:"cart",prio:"Basse",actif:false},
+    {n:"M11",t:"Pisciculture, Apiculture, autres",ic:"drop",prio:"Basse",actif:false},
+    {n:"M12",t:"Rapports avancés & BI",ic:"chart",prio:"Basse",actif:false},
+    {n:"M13",t:"Formation (École GICETECHA)",ic:"clip",prio:"Basse",actif:false}]},
+];
+function Modules({mobile}){
+  return (
+    <div className="fade">
+      <h1 style={{fontSize:26}}>Modules</h1>
+      <p style={{color:"var(--ink3)",margin:"4px 0 16px",fontSize:14}}>13 modules activables progressivement, au rythme de la croissance de l'exploitation.</p>
+      <div style={{display:"flex",gap:12,flexWrap:"wrap",marginBottom:6}}>
+        <Stat icon={I.check} label="Modules actifs" value="2 / 13" tone="var(--green)"/>
+        <Stat icon={I.layers} label="Phase en cours" value="Phase 1" sub="MVP"/>
+        <Stat icon={I.calendar} label="Vision" value="20 ans"/>
+      </div>
+      {MODULES.map((p,pi)=>(
+        <Section key={pi} title={p.ph}>
+          <div style={{display:"grid",gridTemplateColumns:mobile?"1fr":"1fr 1fr",gap:12}}>
+            {p.items.map(m=>(
+              <div key={m.n} style={{background:"var(--surface)",border:"1px solid "+(m.actif?"var(--green)":"var(--line)"),borderRadius:16,padding:14,display:"flex",alignItems:"center",gap:12,opacity:m.actif?1:.82,boxShadow:"var(--shadow-sm)"}}>
+                <span style={{width:42,height:42,borderRadius:12,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",background:m.actif?"var(--green-50)":"var(--neutral-bg)",color:m.actif?"var(--green)":"var(--ink3)"}}>{React.createElement(I[m.ic],{size:20})}</span>
+                <div style={{flex:1,minWidth:0}}>
+                  <div style={{display:"flex",alignItems:"center",gap:6}}><span style={{fontSize:11,fontWeight:700,color:"var(--ink3)"}}>{m.n}</span><strong style={{fontSize:13.5,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{m.t}</strong></div>
+                  <div style={{fontSize:11.5,color:"var(--ink3)",marginTop:2}}>Priorité : {m.prio}</div>
+                </div>
+                {m.actif?<Badge m={{l:"Actif",c:"var(--ok)",bg:"var(--ok-bg)"}}/>:<button className="lift hov" style={{border:"1px solid var(--line)",borderRadius:999,padding:"6px 12px",fontSize:12,fontWeight:600,color:"var(--ink2)",whiteSpace:"nowrap"}}>Activer</button>}
+              </div>))}
+          </div>
+        </Section>))}
+    </div>);
+}
+
+/* ============================ UTILISATEURS (RBAC) ============================ */
+const USERS=[
+  {nom:"Gildas Mebada",mail:"gildas@gicetecha.cm",role:"Gérant",c:"var(--blue)",bg:"var(--blue-50)",actif:true,vu:"En ligne"},
+  {nom:"Cécilia",mail:"cecilia@gicetecha.cm",role:"Co-gérant",c:"var(--green)",bg:"var(--green-50)",actif:true,vu:"il y a 1 h"},
+  {nom:"Jean Owona",mail:"jean.o@gicetecha.cm",role:"Employé",c:"var(--amber)",bg:"var(--warn-bg)",actif:true,vu:"il y a 3 h"},
+  {nom:"Marie Abena",mail:"marie.a@gicetecha.cm",role:"Vendeur",c:"#7C3AED",bg:"#F1EBFC",actif:true,vu:"Hier"},
+  {nom:"Paul Client",mail:"paul@email.cm",role:"Client",c:"var(--neutral)",bg:"var(--neutral-bg)",actif:false,vu:"il y a 5 j"},
+];
+function Utilisateurs({mobile}){
+  return (
+    <div className="fade">
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:10}}>
+        <div><h1 style={{fontSize:26}}>Utilisateurs & rôles</h1><p style={{color:"var(--ink3)",margin:"4px 0 0",fontSize:14}}>Gestion des accès (RBAC) — chaque rôle a ses droits.</p></div>
+        <Btn small><I.plus size={16}/>Inviter un utilisateur</Btn>
+      </div>
+      <div style={{display:"flex",gap:12,flexWrap:"wrap",margin:"18px 0"}}>
+        <Stat icon={I.users} label="Comptes" value="5" sub="4 actifs"/>
+        <Stat icon={I.shield} label="Rôles définis" value="6"/>
+        <Stat icon={I.check} label="En ligne" value="1"/>
+      </div>
+      <div style={{background:"var(--surface)",border:"1px solid var(--line)",borderRadius:18,overflow:"hidden",boxShadow:"var(--shadow-sm)"}}>
+        {USERS.map((u,i)=>(
+          <div key={i} style={{display:"flex",alignItems:"center",gap:13,padding:"13px 16px",borderBottom:i<USERS.length-1?"1px solid var(--line)":"none"}}>
+            <Avatar name={u.nom} size={42} green={u.role==="Co-gérant"}/>
+            <div style={{flex:1,minWidth:0}}>
+              <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}><strong style={{fontSize:14}}>{u.nom}</strong>{!u.actif&&<span style={{fontSize:11,color:"var(--ink3)"}}>· désactivé</span>}</div>
+              {!mobile&&<div style={{fontSize:12,color:"var(--ink3)"}}>{u.mail} · {u.vu}</div>}
+            </div>
+            <span style={{background:u.bg,color:u.c,fontSize:11.5,fontWeight:700,padding:"4px 11px",borderRadius:999,whiteSpace:"nowrap"}}>{u.role}</span>
+            {!mobile&&<button className="lift hov" style={{border:"1px solid var(--line)",borderRadius:10,padding:7,color:"var(--ink3)"}}><I.cog size={16}/></button>}
+          </div>))}
+      </div>
+    </div>);
+}
+
+/* ============================ NOTIFICATIONS ============================ */
+function Notifications({mobile}){
+  const groups=[
+    {t:"Aujourd'hui",items:[
+      {ic:"alert",c:"var(--danger)",bg:"var(--danger-bg)",titre:"Stock bas : Aliment croissance",d:"Il reste 3 sacs (seuil : 5). Réapprovisionnez.",h:"il y a 20 min",unread:true},
+      {ic:"drop",c:"var(--amber)",bg:"var(--warn-bg)",titre:"Mortalité B-024",d:"3 sujets perdus aujourd'hui (forte chaleur).",h:"il y a 2 h",unread:true}]},
+    {t:"Cette semaine",items:[
+      {ic:"coins",c:"var(--green)",bg:"var(--green-50)",titre:"Vente encaissée",d:"Restaurant Le Manguier — 105 000 FCFA.",h:"22 juin",unread:false},
+      {ic:"syringe",c:"var(--blue)",bg:"var(--blue-50)",titre:"Rappel vaccination",d:"Newcastle (rappel) prévu pour B-025.",h:"21 juin",unread:false},
+      {ic:"wifi",c:"var(--blue)",bg:"var(--blue-50)",titre:"Synchronisation terminée",d:"12 saisies hors-ligne synchronisées.",h:"20 juin",unread:false}]},
+  ];
+  return (
+    <div className="fade" style={{maxWidth:680,margin:"0 auto"}}>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+        <h1 style={{fontSize:26}}>Notifications</h1>
+        <button className="hov" style={{color:"var(--blue)",fontSize:13,fontWeight:600}}>Tout marquer comme lu</button></div>
+      {groups.map((g,gi)=>(
+        <div key={gi} style={{marginTop:18}}>
+          <div style={{fontSize:11.5,fontWeight:700,color:"var(--ink3)",textTransform:"uppercase",letterSpacing:.5,margin:"0 2px 9px"}}>{g.t}</div>
+          <div style={{display:"flex",flexDirection:"column",gap:10}}>
+            {g.items.map((n,i)=>(
+              <div key={i} className="lift hov" style={{background:"var(--surface)",border:"1px solid var(--line)",borderRadius:14,padding:14,display:"flex",gap:12,alignItems:"flex-start",position:"relative",boxShadow:"var(--shadow-sm)"}}>
+                <span style={{width:40,height:40,borderRadius:11,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",background:n.bg,color:n.c}}>{React.createElement(I[n.ic],{size:19})}</span>
+                <div style={{flex:1,minWidth:0}}>
+                  <div style={{fontSize:13.5,fontWeight:700}}>{n.titre}</div>
+                  <div style={{fontSize:12.5,color:"var(--ink2)",marginTop:2,lineHeight:1.45}}>{n.d}</div>
+                  <div style={{fontSize:11,color:"var(--ink3)",marginTop:5}}>{n.h}</div>
+                </div>
+                {n.unread&&<span style={{width:9,height:9,borderRadius:"50%",background:"var(--blue)",flexShrink:0,marginTop:4}}/>}
+              </div>))}
+          </div>
+        </div>))}
+    </div>);
+}
+
+/* ============================ PARAMÈTRES / PROFIL ============================ */
+function Toggle({on}){const[v,setV]=useState(on);return(
+  <button onClick={()=>setV(!v)} className="hov" style={{width:46,height:27,borderRadius:999,background:v?"var(--blue)":"var(--neutral-bg)",position:"relative",flexShrink:0}}>
+    <span style={{position:"absolute",top:3,left:v?22:3,width:21,height:21,borderRadius:"50%",background:"#fff",transition:".2s",boxShadow:"0 1px 3px rgba(0,0,0,.3)"}}/></button>);}
+function Parametres({mobile,role}){
+  const Item=({ic:Ico,label,sub,right,last,tone="var(--blue)"})=>(
+    <div style={{display:"flex",alignItems:"center",gap:13,padding:"13px 15px",borderBottom:last?"none":"1px solid var(--line)"}}>
+      <span style={{width:36,height:36,borderRadius:10,background:"var(--blue-50)",color:tone,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}><Ico size={18}/></span>
+      <div style={{flex:1,minWidth:0}}><div style={{fontSize:13.5,fontWeight:600}}>{label}</div>{sub&&<div style={{fontSize:11.5,color:"var(--ink3)"}}>{sub}</div>}</div>
+      {right||<I.chev size={18} style={{color:"var(--ink3)"}}/>}</div>);
+  const Block=({title,children})=>(<div style={{marginTop:18}}>
+    <div style={{fontSize:11.5,fontWeight:700,color:"var(--ink3)",textTransform:"uppercase",letterSpacing:.5,margin:"0 4px 8px"}}>{title}</div>
+    <div style={{background:"var(--surface)",border:"1px solid var(--line)",borderRadius:16,overflow:"hidden",boxShadow:"var(--shadow-sm)"}}>{children}</div></div>);
+  return (
+    <div className="fade" style={{maxWidth:680,margin:"0 auto"}}>
+      <h1 style={{fontSize:26,marginBottom:8}}>Paramètres</h1>
+      <div style={{background:"var(--surface)",border:"1px solid var(--line)",borderRadius:18,padding:16,display:"flex",alignItems:"center",gap:14,boxShadow:"var(--shadow-sm)"}}>
+        <Avatar name={ROLE_USER[role]} size={54} green/>
+        <div style={{flex:1,minWidth:0}}><div style={{fontSize:17,fontWeight:700}}>{ROLE_USER[role]}</div><div style={{fontSize:12.5,color:"var(--ink3)"}}>{ROLE_NET[role]} · GICETECHA</div></div>
+        <Btn small ghost>Modifier</Btn>
+      </div>
+      <Block title="Compte">
+        <Item ic={I.user} label="Nom et profil"/>
+        <Item ic={I.mail} label="Adresse email" sub="gildas@gicetecha.cm" last/>
+      </Block>
+      <Block title="Préférences">
+        <Item ic={I.globe} label="Langue" sub="Français" right={<span style={{fontSize:12.5,color:"var(--ink3)"}}>FR ▾</span>}/>
+        <Item ic={I.bell} label="Notifications push" right={<Toggle on/>} last/>
+      </Block>
+      <Block title="Données (mode hors-ligne)">
+        <Item ic={I.wifi} label="Synchronisation auto" sub="Synchronisé · il y a 2 min" tone="var(--green)" right={<Toggle on/>}/>
+        <Item ic={I.chart} label="Exporter mes données" sub="PDF ou Excel" last/>
+      </Block>
+      <Block title="Sécurité">
+        <Item ic={I.shield} label="Changer le mot de passe"/>
+        <Item ic={I.logout} label="Se déconnecter" tone="var(--danger)" right={<span/>} last/>
+      </Block>
+      <div style={{textAlign:"center",color:"var(--ink3)",fontSize:11.5,marginTop:16,display:"inline-flex",gap:6,alignItems:"center",width:"100%",justifyContent:"center"}}><I.info size={13}/>GICETECHA · version 1.0 (MVP)</div>
+    </div>);
+}
+
+/* ============================ NAV / ROUTER ============================ */
+const NAV={
+  gerant:[["grid","Tableau de bord","Dashboard"],["leaf","Élevage","Elevage"],["coins","Trésorerie","Tresorerie"],["chart","Rapports","Rapports"],["layers","Modules","Modules"],["users","Utilisateurs","Utilisateurs"]],
+  cogerant:[["clip","Saisie du jour","Saisie"],["leaf","Élevage","Elevage"],["cart","Ventes","Ventes"],["box","Stocks","Stocks"]],
+  vendeur:[["store","Caisse","Caisse"],["receipt","Ventes","Ventes"],["box","Produits","Produits"]],
+  client:[["store","Boutique","Boutique"],["cart","Panier","Panier"],["receipt","Mes commandes","Commandes"]],
+};
+const SHORT={Dashboard:"Accueil",Tresorerie:"Compta",Utilisateurs:"Équipe",Commandes:"Cmd.",Boutique:"Boutique"};
+const ROLES=[["gerant","Gérant"],["cogerant","Co-gérant"],["vendeur","Vendeur"],["client","Client"]];
+const ROLE_USER={gerant:"Gildas Mebada",cogerant:"Cécilia",vendeur:"Point de vente",client:"Mon compte"};
+const ROLE_NET={gerant:"Gérant",cogerant:"Co-gérante",vendeur:"Caisse",client:"Client"};
+
+function renderScreen(role,screen,ctx){
+  const {selected,setSelected,go,mobile}=ctx;
+  if(screen==="Notifications") return <Notifications mobile={mobile}/>;
+  if(screen==="Parametres") return <Parametres mobile={mobile} role={role}/>;
+  if(role==="gerant"){
+    if(screen==="Dashboard") return <Dashboard mobile={mobile} go={go}/>;
+    if(screen==="Elevage") return <ElevageList mobile={mobile} onOpen={b=>{setSelected(b);go("__bande");}}/>;
+    if(screen==="__bande") return <BandeDetail mobile={mobile} b={selected} onBack={()=>go("Elevage")}/>;
+    if(screen==="Tresorerie") return <Tresorerie mobile={mobile}/>;
+    if(screen==="Rapports") return <Rapports mobile={mobile}/>;
+    if(screen==="Modules") return <Modules mobile={mobile}/>;
+    if(screen==="Utilisateurs") return <Utilisateurs mobile={mobile}/>;
+  }
+  if(role==="cogerant"){
+    if(screen==="Saisie") return <Saisie mobile={mobile}/>;
+    if(screen==="Elevage") return <ElevageList mobile={mobile} onOpen={b=>{setSelected(b);go("__bande");}}/>;
+    if(screen==="__bande") return <BandeDetail mobile={mobile} b={selected} onBack={()=>go("Elevage")}/>;
+    if(screen==="Ventes") return <Ventes mobile={mobile}/>;
+    if(screen==="Stocks") return <Stocks mobile={mobile}/>;
+  }
+  if(role==="vendeur"){
+    if(screen==="Caisse") return <Caisse mobile={mobile}/>;
+    if(screen==="Ventes") return <Ventes mobile={mobile}/>;
+    if(screen==="Produits") return <Boutique mobile={mobile} go={go}/>;
+  }
+  if(role==="client"){
+    if(screen==="Boutique") return <Boutique mobile={mobile} go={go}/>;
+    if(screen==="Panier") return <Panier mobile={mobile}/>;
+    if(screen==="Commandes") return <Commandes mobile={mobile}/>;
+  }
+  return <div style={{padding:40,textAlign:"center",color:"var(--ink3)"}}>Écran « {screen} »</div>;
+}
+
+/* ============================ LAYOUTS ============================ */
+function Brand({size=17,light}){return (
+  <div style={{display:"flex",alignItems:"center",gap:9}}>
+    <span style={{width:size*2,height:size*2,borderRadius:10,background:"linear-gradient(135deg,#15803D,#16A34A)",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff"}}><I.leaf size={size*1.2}/></span>
+    <div><div style={{fontWeight:800,fontSize:size,fontFamily:"'Outfit',sans-serif",color:light?"#fff":"var(--ink)"}}>GICE<span style={{color:"var(--green)"}}>TECHA</span></div></div>
+  </div>);}
+
+function Sidebar({role,screen,go}){
+  return (
+    <aside style={{width:248,background:"var(--slate)",color:"#fff",minHeight:"100%",padding:"22px 16px",display:"flex",flexDirection:"column",flexShrink:0}}>
+      <div style={{display:"flex",alignItems:"center",gap:10,padding:"0 8px 8px"}}>
+        <span style={{width:36,height:36,borderRadius:10,background:"linear-gradient(135deg,#15803D,#16A34A)",display:"flex",alignItems:"center",justifyContent:"center"}}><I.leaf size={21}/></span>
+        <div><div style={{fontWeight:800,fontSize:16,fontFamily:"'Outfit',sans-serif"}}>GICE<span style={{color:"#4ade80"}}>TECHA</span></div>
+        <div style={{fontSize:10,color:"#94a3b8"}}>{ROLE_NET[role]}</div></div>
+      </div>
+      <div style={{fontSize:10.5,color:"#64748b",fontWeight:700,letterSpacing:.5,padding:"14px 10px 8px"}}>MODULES</div>
+      <nav style={{display:"flex",flexDirection:"column",gap:3,flex:1}}>
+        {NAV[role].map(([ic,label,key])=>{const act=screen===key||(screen.startsWith("__")&&key==="Elevage");
+          return <button key={key} onClick={()=>go(key)} className="nav-it hov" style={{display:"flex",alignItems:"center",gap:11,padding:"11px 12px",borderRadius:12,background:act?"var(--blue)":"transparent",color:act?"#fff":"#cbd5e1",fontWeight:act?600:500,fontSize:13.5,textAlign:"left"}}>
+            {React.createElement(I[ic],{size:18})}{label}</button>;})}
+      </nav>
+      <div style={{borderTop:"1px solid #1e293b",paddingTop:14,marginTop:10,display:"flex",alignItems:"center",gap:10,padding:"14px 8px 0"}}>
+        <Avatar name={ROLE_USER[role]} size={34} green/>
+        <div style={{minWidth:0}}><div style={{fontSize:13,fontWeight:600,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{ROLE_USER[role]}</div><div style={{fontSize:11,color:"#94a3b8"}}>Cameroun</div></div>
+      </div>
+    </aside>);
+}
+
+function DesktopLayout({role,screen,go,body,onLogout}){
+  return (
+    <div style={{display:"flex",minHeight:600,border:"1px solid var(--line)",borderRadius:24,overflow:"hidden",background:"var(--bg)",boxShadow:"var(--shadow)"}}>
+      <Sidebar role={role} screen={screen} go={go}/>
+      <div style={{flex:1,minWidth:0,display:"flex",flexDirection:"column"}}>
+        <header style={{background:"var(--surface)",borderBottom:"1px solid var(--line)",padding:"12px 22px",display:"flex",alignItems:"center",gap:14}}>
+          <div style={{display:"flex",alignItems:"center",gap:9,flex:1,maxWidth:360,background:"var(--bg)",border:"1px solid var(--line)",borderRadius:999,padding:"9px 14px",color:"var(--ink3)"}}>
+            <I.search size={17}/><span style={{fontSize:13.5}}>Rechercher…</span></div>
+          <span style={{display:"inline-flex",alignItems:"center",gap:6,fontSize:12,color:"var(--green)",background:"var(--green-50)",padding:"6px 11px",borderRadius:999,fontWeight:600}}><I.wifi size={14}/>Synchronisé</span>
+          <button onClick={()=>go("Notifications")} title="Notifications" className="hov" style={{position:"relative",color:"var(--ink2)",padding:6}}><I.bell size={20}/><span style={{position:"absolute",top:3,right:3,width:8,height:8,borderRadius:"50%",background:"var(--blue)"}}/></button>
+          <button onClick={()=>go("Parametres")} title="Paramètres" className="hov" style={{color:"var(--ink2)",padding:6}}><I.cog size={20}/></button>
+          <button onClick={onLogout} title="Se déconnecter" className="hov" style={{color:"var(--ink3)",padding:6}}><I.logout size={20}/></button>
+        </header>
+        <main style={{padding:24,overflow:"auto",flex:1}}>{body}</main>
+      </div>
+    </div>);
+}
+
+function MobileLayout({role,screen,go,body,onLogout}){
+  const items=NAV[role];
+  return (
+    <div style={{display:"flex",justifyContent:"center"}}>
+      <div className="phone-shell" style={{width:390,maxWidth:"100%",background:"var(--bg)",borderRadius:38,border:"9px solid #0f172a",overflow:"hidden",display:"flex",flexDirection:"column",height:780}}>
+        <div style={{background:"#0f172a",height:24,display:"flex",justifyContent:"center"}}><div style={{width:120,height:18,background:"#0f172a",borderRadius:"0 0 14px 14px"}}/></div>
+        <header style={{background:"var(--surface)",borderBottom:"1px solid var(--line)",padding:"12px 16px",display:"flex",alignItems:"center",gap:10}}>
+          <span style={{width:30,height:30,borderRadius:9,background:"linear-gradient(135deg,#15803D,#16A34A)",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff"}}><I.leaf size={18}/></span>
+          <span style={{fontWeight:800,fontSize:15,fontFamily:"'Outfit',sans-serif"}}>GICE<span style={{color:"var(--green)"}}>TECHA</span></span>
+          <button onClick={()=>go("Notifications")} style={{marginLeft:"auto",position:"relative",color:"var(--ink2)"}}><I.bell size={20}/><span style={{position:"absolute",top:-1,right:-1,width:7,height:7,borderRadius:"50%",background:"var(--blue)"}}/></button>
+          <button onClick={()=>go("Parametres")} className="hov" style={{color:"var(--ink2)"}}><I.cog size={19}/></button>
+          <button onClick={onLogout} title="Se déconnecter" className="hov" style={{color:"var(--ink3)"}}><I.logout size={19}/></button>
+        </header>
+        <main style={{flex:1,overflow:"auto",padding:16}}>{body}</main>
+        <nav style={{background:"var(--surface)",borderTop:"1px solid var(--line)",display:"flex",justifyContent:"space-around",padding:"8px 2px 14px"}}>
+          {items.map(([ic,label,key])=>{const act=screen===key||(screen.startsWith("__")&&key==="Elevage");
+            return <button key={key} onClick={()=>go(key)} style={{flex:1,minWidth:0,display:"flex",flexDirection:"column",alignItems:"center",gap:3,padding:"4px 0",color:act?"var(--blue)":"var(--ink3)"}}>
+              {React.createElement(I[ic],{size:20})}<span style={{fontSize:9,fontWeight:act?700:500,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis",maxWidth:"100%"}}>{SHORT[key]||label.split(" ")[0]}</span></button>;})}
+        </nav>
+      </div>
+    </div>);
+}
+
+/* ============================ LOGIN ============================ */
+function Login({onLogin}){
+  const [role,setRole]=useState("gerant");
+  const Field=({label,icon:Ico,value,pwd})=>(
+    <div style={{marginBottom:13}}>
+      <label style={{fontSize:12.5,fontWeight:600,color:"var(--ink2)"}}>{label}</label>
+      <div style={{marginTop:6,display:"flex",alignItems:"center",gap:9,background:"var(--bg)",border:"1px solid var(--line)",borderRadius:12,padding:"12px 13px"}}>
+        <Ico size={17} style={{color:"var(--ink3)"}}/>
+        <input defaultValue={value} type={pwd?"password":"text"} style={{flex:1,minWidth:0,border:"none",outline:"none",background:"transparent",fontSize:14,color:"var(--ink)",fontFamily:"Inter"}}/>
+      </div>
+    </div>);
+  const roles={gerant:{l:"Gérant",ic:I.grid,d:"Pilotage global"},cogerant:{l:"Co-gérant",ic:I.clip,d:"Saisie & ventes"},vendeur:{l:"Vendeur",ic:I.store,d:"Caisse"},client:{l:"Client",ic:I.cart,d:"Boutique"}};
+  return (
+    <div style={{minHeight:"100vh",display:"flex",alignItems:"center",justifyContent:"center",background:"radial-gradient(circle at 30% 15%, #1e293b, #0f172a 72%)",padding:"30px 16px"}}>
+      <div className="login-grid" style={{width:"100%",maxWidth:940,display:"grid",gridTemplateColumns:"1fr 1fr",borderRadius:24,overflow:"hidden",boxShadow:"var(--shadow)",background:"var(--surface)"}}>
+        <div className="login-hero" style={{background:"linear-gradient(150deg,#14532D,#16A34A 55%,#2563EB)",color:"#fff",padding:"38px 34px",display:"flex",flexDirection:"column"}}>
+          <Brand light/>
+          <div style={{flex:1,display:"flex",flexDirection:"column",justifyContent:"center",padding:"30px 0"}}>
+            <h1 style={{fontSize:29,lineHeight:1.18,color:"#fff"}}>Pilotez toute votre exploitation, du poulailler à la vente.</h1>
+            <p style={{opacity:.92,marginTop:14,fontSize:14.5,lineHeight:1.6}}>Élevage, trésorerie, stocks et boutique — un seul outil, même hors-ligne.</p>
+            <div style={{display:"flex",gap:22,marginTop:26}}>
+              {[["13","modules"],["20 ans","de vision"],["100%","hors-ligne"]].map((s,i)=>(
+                <div key={i}><div style={{fontSize:22,fontWeight:800,fontFamily:"'Outfit',sans-serif"}}>{s[0]}</div><div style={{fontSize:11.5,opacity:.85}}>{s[1]}</div></div>))}
+            </div>
+          </div>
+          <div style={{display:"inline-flex",alignItems:"center",gap:7,fontSize:12.5,opacity:.9}}><I.wifi size={16}/>Synchronisation automatique à la reconnexion</div>
+        </div>
+        <div style={{padding:"34px 32px"}}>
+          <h2 style={{fontSize:22}}>Connexion</h2>
+          <p style={{color:"var(--ink3)",fontSize:13.5,margin:"4px 0 20px"}}>Accédez à votre espace GICETECHA.</p>
+          <Field label="Email" icon={I.user} value="gildas@gicetecha.cm"/>
+          <Field label="Mot de passe" icon={I.coins} value="motdepasse" pwd/>
+          <div style={{fontSize:12.5,fontWeight:600,color:"var(--ink2)",margin:"6px 0 8px"}}>Se connecter en tant que</div>
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:18}}>
+            {ROLES.map(([k])=>{const r=roles[k];const act=role===k;
+              return <button key={k} onClick={()=>setRole(k)} className="hov" style={{display:"flex",alignItems:"center",gap:9,textAlign:"left",padding:"10px 12px",borderRadius:12,border:"1.5px solid "+(act?"var(--blue)":"var(--line)"),background:act?"var(--blue-50)":"var(--surface)"}}>
+                <span style={{width:32,height:32,borderRadius:9,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",background:act?"var(--blue)":"var(--neutral-bg)",color:act?"#fff":"var(--ink3)"}}>{React.createElement(r.ic,{size:17})}</span>
+                <span style={{minWidth:0}}><span style={{display:"block",fontSize:13,fontWeight:700,color:"var(--ink)"}}>{r.l}</span><span style={{fontSize:11,color:"var(--ink3)"}}>{r.d}</span></span>
+              </button>;})}
+          </div>
+          <Btn full onClick={()=>onLogin(role)}>Se connecter <I.arrow size={17}/></Btn>
+          <div style={{textAlign:"center",marginTop:14}}><button className="hov" style={{color:"var(--blue)",fontSize:12.5,fontWeight:600}}>Mot de passe oublié ?</button></div>
+        </div>
+      </div>
+    </div>);
+}
+
+/* ============================ APP SHELL ============================ */
+function App(){
+  const [auth,setAuth]=useState(false);
+  const [mode,setMode]=useState("desktop");
+  const [role,setRole]=useState("gerant");
+  const [screen,setScreen]=useState("Dashboard");
+  const [selected,setSelected]=useState(BANDES[0]);
+  const defScreen=r=>NAV[r][0][2];
+  const switchRole=r=>{setRole(r);setScreen(defScreen(r));};
+  const go=s=>setScreen(s);
+  if(!auth) return <Login onLogin={r=>{setRole(r);setScreen(defScreen(r));setAuth(true);}}/>;
+  const mobile=mode==="mobile";
+  const body=renderScreen(role,screen,{selected,setSelected,go,mobile});
+  const Layout=mobile?MobileLayout:DesktopLayout;
+  return (
+    <div style={{minHeight:"100vh"}}>
+      <div style={{background:"var(--slate)",color:"#fff",padding:"14px 20px",display:"flex",alignItems:"center",gap:16,flexWrap:"wrap",position:"sticky",top:0,zIndex:50}}>
+        <div style={{display:"flex",alignItems:"center",gap:10,marginRight:"auto"}}>
+          <span style={{width:34,height:34,borderRadius:10,background:"linear-gradient(135deg,#15803D,#16A34A)",display:"flex",alignItems:"center",justifyContent:"center"}}><I.leaf size={20}/></span>
+          <div><div style={{fontWeight:800,fontSize:15,fontFamily:"'Outfit',sans-serif"}}>Maquette — GICETECHA</div>
+          <div style={{fontSize:11,color:"#94a3b8"}}>Agropastoral & Agro-industriel · MVP · Cameroun</div></div>
+        </div>
+        <div style={{display:"flex",gap:4,background:"#1e293b",padding:4,borderRadius:999}}>
+          {ROLES.map(([k,l])=><button key={k} onClick={()=>switchRole(k)} style={{padding:"7px 13px",borderRadius:999,fontSize:12,fontWeight:600,background:role===k?"var(--blue)":"transparent",color:role===k?"#fff":"#cbd5e1"}}>{l}</button>)}
+        </div>
+        <div style={{display:"flex",gap:4,background:"#1e293b",padding:4,borderRadius:999}}>
+          {[["desktop","🖥  Desktop"],["mobile","📱  Mobile"]].map(([k,l])=><button key={k} onClick={()=>setMode(k)} style={{padding:"7px 13px",borderRadius:999,fontSize:12,fontWeight:600,background:mode===k?"#fff":"transparent",color:mode===k?"var(--slate)":"#cbd5e1"}}>{l}</button>)}
+        </div>
+      </div>
+      <div style={{maxWidth:1240,margin:"0 auto",padding:mobile?"24px 14px 50px":"26px 22px 60px"}}>
+        <Layout role={role} screen={screen} go={go} body={body} onLogout={()=>setAuth(false)}/>
+        <p style={{textAlign:"center",color:"var(--ink3)",fontSize:12,marginTop:20}}>Prototype interactif — changez de rôle, basculez Desktop / Mobile, ouvrez une bande ou la caisse.</p>
+      </div>
+    </div>);
+}
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+</script>
+</body>
+</html>
