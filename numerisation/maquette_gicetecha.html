@@ -84,11 +84,25 @@ const I={
   mail:(p)=><Ic {...p} d={<><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="m3.5 7 8.5 6 8.5-6"/></>}/>,
   globe:(p)=><Ic {...p} d={<><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></>}/>,
   info:(p)=><Ic {...p} d={<><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8v.5"/></>}/>,
+  idcard:(p)=><Ic {...p} d={<><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="11" r="2.2"/><path d="M5.5 16c.5-1.6 1.7-2.2 3-2.2s2.5.6 3 2.2M14 10h4M14 13h3"/></>}/>,
+  contact:(p)=><Ic {...p} d={<><rect x="4" y="3" width="16" height="18" rx="2"/><circle cx="12" cy="10" r="2.4"/><path d="M8.5 16.5c.6-1.7 2-2.3 3.5-2.3s2.9.6 3.5 2.3M2 7.5h2M2 12h2M2 16.5h2"/></>}/>,
+  bean:(p)=><Ic {...p} d={<><path d="M9 3c5.5 0 9 4 9 9s-3.5 9-8 9-7-4-7-8.5C3 7 5 3 9 3Z"/><path d="M12 7c-2.5 2-3.5 5.5-3.5 10"/></>}/>,
+  tag:(p)=><Ic {...p} d={<><path d="M3 11.5V5a2 2 0 0 1 2-2h6.5a2 2 0 0 1 1.4.6l7 7a2 2 0 0 1 0 2.8l-6.6 6.6a2 2 0 0 1-2.8 0l-7-7A2 2 0 0 1 3 11.5Z"/><circle cx="7.5" cy="7.5" r="1.2" fill="currentColor"/></>}/>,
+  fish:(p)=><Ic {...p} d={<><path d="M2.5 12s4-5.5 10-5.5c4 0 7.5 2.5 9 5.5-1.5 3-5 5.5-9 5.5-6 0-10-5.5-10-5.5Z"/><path d="M22 8.5l-3 3.5 3 3.5"/><circle cx="8" cy="11" r=".7" fill="currentColor"/></>}/>,
+  pie:(p)=><Ic {...p} d={<><circle cx="12" cy="12" r="9"/><path d="M12 12V3M12 12l7.5 5"/></>}/>,
+  book:(p)=><Ic {...p} d={<><path d="M5 5a2 2 0 0 1 2-2h12v15H7a2 2 0 0 0-2 2z"/><path d="M5 20a2 2 0 0 1 2-2h12"/></>}/>,
+  eye:(p)=><Ic {...p} d={<><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></>}/>,
+  clock:(p)=><Ic {...p} d={<><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></>}/>,
+  image:(p)=><Ic {...p} d={<><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></>}/>,
 };
 
 /* ============================ DATA ============================ */
-const fcfa=n=>n.toLocaleString('fr-FR')+" FCFA";
-const fk=n=> (n>=1000000?(n/1000000).toLocaleString('fr-FR',{maximumFractionDigits:2})+" M":n.toLocaleString('fr-FR'));
+const CURRENCIES={FCFA:{sym:"FCFA",rate:1,pre:false},EUR:{sym:"€",rate:1/655.957,pre:false},USD:{sym:"$",rate:1/600,pre:true}};
+let _CUR=CURRENCIES.FCFA;
+const fcfa=n=>{const v=Math.round(n*_CUR.rate).toLocaleString('fr-FR');return _CUR.pre?_CUR.sym+" "+v:v+" "+_CUR.sym;};
+const fk=n=>{const x=n*_CUR.rate;const v=x>=1000000?(x/1000000).toLocaleString('fr-FR',{maximumFractionDigits:2})+" M":Math.round(x).toLocaleString('fr-FR');return _CUR.pre?_CUR.sym+" "+v:v+" "+_CUR.sym;};
+const THEMES={light:{},dark:{"--bg":"#0B1220","--surface":"#131C2E","--ink":"#F1F5F9","--ink2":"#C2CCDA","--ink3":"#7C8AA5","--line":"#243044","--neutral":"#8FA0BC","--neutral-bg":"#1C2740","--blue-50":"rgba(59,130,246,.15)","--blue-100":"rgba(59,130,246,.25)","--green-50":"rgba(22,163,74,.18)","--ok-bg":"rgba(22,163,74,.2)","--warn-bg":"rgba(217,119,6,.2)","--danger-bg":"rgba(220,38,38,.2)","--info-bg":"rgba(29,78,216,.22)"}};
+const BRANDS={blue:["#2563EB","#1D4ED8","#3B82F6"],green:["#16A34A","#15803D","#22C55E"],violet:["#7C3AED","#6D28D9","#8B5CF6"],amber:["#D97706","#B45309","#F59E0B"],rose:["#E11D48","#BE123C","#FB7185"],slate:["#334155","#1E293B","#475569"]};
 
 const BANDES=[
   {id:"B-024", nom:"Poulets de chair", init:210, effectif:200, jour:28, duree:42, mortalite:4.8, statut:"encours", cout:420000, vente:0, seed:"poulet-a"},
@@ -135,9 +149,34 @@ const Badge=({m})=> <span style={{background:m.bg,color:m.c,fontSize:11.5,fontWe
 const Avatar=({name,size=44,green})=>{const ini=name.split(" ").map(w=>w[0]).slice(0,2).join("");
   return <div style={{width:size,height:size,borderRadius:"50%",flexShrink:0,background:green?"var(--green-50)":"var(--blue-100)",color:green?"var(--green)":"var(--blue-700)",fontWeight:700,display:"flex",alignItems:"center",justifyContent:"center",fontSize:size*.36}}>{ini}</div>;};
 
-const Photo=({seed,h=120,radius=12,label})=>(
+// Images thématiques figées (Openverse, CC) — fiables et adaptées à chaque illustration
+const OV="https://api.openverse.org/v1/images/";
+const PIC={
+  chicken:["86f1350f-ff6c-4dd8-89d4-59bbefe86743","eb34417d-310c-41fa-8847-5b34b2b41c16","a845386c-29d5-40a4-961f-df3080abe656","a58c8f9a-b0d4-41ac-83c5-9a84cb338052"],
+  poultry:["33dbc232-c357-4562-8efc-b723272bf411"],
+  roast:["c9b27507-2fed-49f9-ab35-2e03b809306c"],
+  pig:["44293f28-e87b-4d75-a8e7-0e8af837e976","e4b370fa-3285-4759-a9b1-2aa87f37bc2a","c3a41ff2-dd73-468c-9321-2c6150efdc2c","6dc28f60-6182-4d69-a1d7-b6baec7e10e6"],
+  cocoa:["112df6ce-7a22-480f-8d31-85301922b99f","dc05bee7-26e2-49da-95c9-42b84e1631a4"],
+  maize:["ba6e1932-3a00-4179-8c9a-90ac0ec119d6"],
+  cassava:["0501472e-7cc5-4db0-a087-f91a7bb2c8bc"],
+  plantain:["fa51d88f-440f-4803-9172-1aeaa039d2ca"],
+  eggs:["05bb30a7-e21f-4ad9-bae9-3447ccd324cd","cb786bb6-abac-426a-b717-f4d3dbcf1e90"],
+  honey:["0ee0bd83-75ca-4a0d-827f-28cd8d5027b4"],
+  farm:["02d31409-825b-469a-bf79-5e01e881bfc6"],
+  farmer:["15f1795c-c28d-4b4c-979e-e6d870fde18f"],
+  course:["54ecd295-264d-4098-bf00-543465d21b37","94b7ef79-0e23-4659-b9a6-65ec2037b160","9a33dfb2-e081-4900-a9a0-b32f22b31e74","1676e39c-7117-43c2-ae6e-74a29241fcb4","40511bf2-ecc7-4d2d-beae-8c81778c421f","2b2d59a1-7547-497a-af85-b4dd4d9ea6e1"],
+  fish:["ce3277e6-1940-4e41-ab95-b3cdf2b9b233"],
+  rabbit:["870db45d-47c8-4854-8f7e-d9372a306d7b"],
+  bees:["f1a2c325-fda2-44a3-805c-66a168e32fb5"],
+  turkey:["65fea705-4c12-4949-ae56-4a3e9ca1723f"],
+};
+const GMAP=[["poulet","chicken"],["poule","poultry"],["chair","chicken"],["roti","roast"],["porc","pig"],["cacao","cocoa"],["mais","maize"],["manioc","cassava"],["plantain","plantain"],["oeuf","eggs"],["miel","honey"],["emp","farmer"],["cover","farm"]];
+function imgCat(s){s=(""+s).toLowerCase();for(const[k,v]of GMAP){if(s.includes(k))return v;}return "farm";}
+function hsh(s){let h=0;s=""+s;for(let i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))>>>0;return h;}
+function imgUrl(seed,kw){const cat=PIC[kw]?kw:imgCat(seed);const arr=PIC[cat]||PIC.farm;return OV+arr[hsh(seed||cat)%arr.length]+"/thumb/";}
+const Photo=({seed,h=120,radius=12,label,kw})=>(
   <div style={{height:h,borderRadius:radius,position:"relative",overflow:"hidden",background:"linear-gradient(135deg,var(--blue-100),#c7d2fe)"}}>
-    <img src={`https://picsum.photos/seed/gic-${encodeURIComponent(seed)}/500/360`} alt="" style={{width:"100%",height:"100%",objectFit:"cover",display:"block"}}/>
+    <img src={imgUrl(seed,kw)} alt="" loading="lazy" style={{width:"100%",height:"100%",objectFit:"cover",display:"block"}}/>
     {label&&<div style={{position:"absolute",left:8,bottom:6,color:"#fff",fontSize:11,fontWeight:600,background:"rgba(15,23,42,.4)",padding:"2px 8px",borderRadius:999}}>{label}</div>}
   </div>);
 
@@ -160,8 +199,8 @@ const Progress=({value,color="var(--blue)"})=>(
     <div style={{width:value+"%",height:"100%",background:color,borderRadius:999}}/></div>);
 
 /* ============================ SCREENS — GÉRANT ============================ */
-function Dashboard({mobile,go}){
-  const acts=[["leaf","Volaille","Actif","var(--green)",true],["pig","Porcs","Phase 2",null,false],["wheat","Cultures","Phase 2",null,false],["store","Transformation","Phase 2",null,false]];
+function Dashboard({mobile,go,act}){
+  const acts=[["leaf","Volaille",true,"Elevage"],["pig","Porcs",act.includes("M3"),"Porcs"],["wheat","Cultures",act.includes("M4"),"Cultures"],["store","Transformation",act.includes("M6"),null]];
   return (
     <div className="fade">
       <h1 style={{fontSize:26}}>Bonjour, Gildas 👋</h1>
@@ -175,11 +214,11 @@ function Dashboard({mobile,go}){
 
       <Section title="Activités de l'exploitation">
         <div style={{display:"grid",gridTemplateColumns:mobile?"1fr 1fr":"repeat(4,1fr)",gap:12}}>
-          {acts.map(([ic,nom,etat,col,active])=>(
-            <div key={nom} className={active?"card-hov hov":""} onClick={()=>active&&go("Elevage")} style={{background:"var(--surface)",border:"1px solid var(--line)",borderRadius:16,padding:16,opacity:active?1:.6,cursor:active?"pointer":"default",boxShadow:"var(--shadow-sm)"}}>
+          {acts.map(([ic,nom,active,target])=>(
+            <div key={nom} className={active&&target?"card-hov hov":""} onClick={()=>active&&target&&go(target)} style={{background:"var(--surface)",border:"1px solid var(--line)",borderRadius:16,padding:16,opacity:active?1:.6,cursor:active&&target?"pointer":"default",boxShadow:"var(--shadow-sm)"}}>
               <span style={{color:active?"var(--green)":"var(--ink3)",background:active?"var(--green-50)":"var(--neutral-bg)",borderRadius:12,padding:9,display:"inline-flex"}}>{React.createElement(I[ic],{size:20})}</span>
               <div style={{fontWeight:700,marginTop:10,fontSize:14.5}}>{nom}</div>
-              <div style={{fontSize:12,fontWeight:600,marginTop:3,color:active?"var(--green)":"var(--ink3)"}}>{etat}</div>
+              <div style={{fontSize:12,fontWeight:600,marginTop:3,color:active?"var(--green)":"var(--ink3)"}}>{active?"Actif":"Phase 2"}</div>
             </div>))}
         </div>
       </Section>
@@ -211,12 +250,12 @@ function Dashboard({mobile,go}){
     </div>);
 }
 
-function ElevageList({mobile,onOpen,saisie}){
+function ElevageList({mobile,onOpen,openModal}){
   return (
     <div className="fade">
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:10}}>
         <div><h1 style={{fontSize:26}}>Élevage — Volaille</h1><p style={{color:"var(--ink3)",margin:"4px 0 0",fontSize:14}}>Suivi des bandes (cycles d'élevage).</p></div>
-        <Btn small><I.plus size={16}/>Nouvelle bande</Btn>
+        <Btn small onClick={()=>openModal("bande")}><I.plus size={16}/>Nouvelle bande</Btn>
       </div>
       <div style={{display:"grid",gridTemplateColumns:mobile?"1fr":"repeat(auto-fill,minmax(280px,1fr))",gap:16,marginTop:18}}>
         {BANDES.map(b=>{const survie=Math.round((b.effectif||b.init*(1-b.mortalite/100))); const prog=Math.round(b.jour/b.duree*100);
@@ -239,14 +278,22 @@ function ElevageList({mobile,onOpen,saisie}){
     </div>);
 }
 
-function BandeDetail({b,onBack,mobile}){
+function BandeDetail({b,onBack,mobile,openModal}){
   b=b||BANDES[0];
   const survie=b.statut==="terminee"?b.init:b.effectif;
   const entries=[
-    {ic:I.alert,t:"Mortalité",v:"3 sujets",d:"Aujourd'hui · forte chaleur",c:"var(--danger)"},
-    {ic:I.leaf,t:"Alimentation",v:"25 kg",d:"Aujourd'hui · croissance",c:"var(--green)"},
-    {ic:I.syringe,t:"Vaccination",v:"Newcastle",d:"15 juin · rappel",c:"var(--blue)"},
-    {ic:I.coins,t:"Vente",v:"—",d:"Cycle non clôturé",c:"var(--neutral)"},
+    {ic:I.alert,t:"Mortalité",v:"3 sujets",d:"Aujourd'hui · forte chaleur",c:"var(--danger)",m:"mortalite"},
+    {ic:I.leaf,t:"Alimentation",v:"25 kg",d:"Aujourd'hui · croissance",c:"var(--green)",m:"alimentation"},
+    {ic:I.syringe,t:"Vaccination",v:"Newcastle",d:"15 juin · rappel",c:"var(--blue)",m:"vaccination"},
+    {ic:I.coins,t:"Vente",v:"—",d:"Cycle non clôturé",c:"var(--neutral)",m:"vente"},
+  ];
+  const MORT=[{l:"S1",v:2},{l:"S2",v:1},{l:"S3",v:4},{l:"S4",v:3},{l:"S5",v:2},{l:"S6",v:3}];
+  const JOURNAL=[
+    {ic:I.alert,c:"var(--danger)",t:"Mortalité — 3 sujets",d:"Aujourd'hui · 14:20 · forte chaleur"},
+    {ic:I.leaf,c:"var(--green)",t:"Alimentation — 25 kg (croissance)",d:"Aujourd'hui · 07:10"},
+    {ic:I.leaf,c:"var(--green)",t:"Alimentation — 24 kg (croissance)",d:"Hier · 07:05"},
+    {ic:I.syringe,c:"var(--blue)",t:"Vaccination — Newcastle (rappel)",d:"15 juin · 09:00"},
+    {ic:I.coins,c:"var(--green)",t:"Coût — Aliment croissance",d:"08 juin · −96 000 FCFA"},
   ];
   return (
     <div className="fade">
@@ -270,23 +317,71 @@ function BandeDetail({b,onBack,mobile}){
           <div key={i} style={{background:"var(--surface)",border:"1px solid var(--line)",borderRadius:16,padding:15,display:"flex",alignItems:"center",gap:12,boxShadow:"var(--shadow-sm)"}}>
             <span style={{width:42,height:42,borderRadius:12,display:"flex",alignItems:"center",justifyContent:"center",background:"var(--blue-50)",color:e.c}}><e.ic size={20}/></span>
             <div style={{flex:1}}><div style={{fontSize:12,color:"var(--ink3)"}}>{e.t}</div><div style={{fontWeight:700,fontSize:15}}>{e.v}</div><div style={{fontSize:11,color:"var(--ink3)"}}>{e.d}</div></div>
-            <button className="lift hov" style={{border:"1px solid var(--line)",borderRadius:10,padding:7,color:"var(--blue)"}}><I.plus size={16}/></button>
+            <button onClick={()=>openModal(e.m)} className="lift hov" style={{border:"1px solid var(--line)",borderRadius:10,padding:7,color:"var(--blue)"}}><I.plus size={16}/></button>
           </div>))}
+      </div>
+
+      <div style={{display:"grid",gridTemplateColumns:mobile?"1fr":"1.25fr 1fr",gap:16,marginTop:16}}>
+        <div style={{background:"var(--surface)",border:"1px solid var(--line)",borderRadius:18,padding:18,boxShadow:"var(--shadow-sm)"}}>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:6}}>
+            <strong>Courbe de mortalité</strong><span style={{fontSize:11.5,color:"var(--ink3)"}}>sujets / semaine</span></div>
+          <LineChart data={MORT} color="var(--danger)" height={130}/>
+        </div>
+        <div style={{background:"var(--surface)",border:"1px solid var(--line)",borderRadius:18,padding:18,boxShadow:"var(--shadow-sm)"}}>
+          <strong>Journal des opérations</strong>
+          <div style={{marginTop:12,position:"relative"}}>
+            {JOURNAL.map((j,i)=>(
+              <div key={i} style={{display:"flex",gap:12,paddingBottom:i<JOURNAL.length-1?14:0}}>
+                <div style={{display:"flex",flexDirection:"column",alignItems:"center"}}>
+                  <span style={{width:30,height:30,borderRadius:9,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",background:"var(--blue-50)",color:j.c}}><j.ic size={15}/></span>
+                  {i<JOURNAL.length-1&&<span style={{flex:1,width:2,background:"var(--line)",marginTop:2}}/>}
+                </div>
+                <div style={{flex:1,minWidth:0,paddingTop:2}}><div style={{fontSize:13,fontWeight:600,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{j.t}</div><div style={{fontSize:11.5,color:"var(--ink3)"}}>{j.d}</div></div>
+              </div>))}
+          </div>
+        </div>
       </div>
     </div>);
 }
 
-function Tresorerie({mobile}){
+function Tresorerie({mobile,openModal}){
   return (
     <div className="fade">
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:10}}>
         <div><h1 style={{fontSize:26}}>Trésorerie & Comptabilité</h1><p style={{color:"var(--ink3)",margin:"4px 0 0",fontSize:14}}>Mouvements, profits & pertes.</p></div>
-        <Btn small><I.plus size={16}/>Nouveau mouvement</Btn>
+        <Btn small onClick={()=>openModal("mouvement")}><I.plus size={16}/>Nouveau mouvement</Btn>
       </div>
       <div style={{display:"grid",gridTemplateColumns:mobile?"1fr 1fr":"repeat(3,1fr)",gap:12,margin:"18px 0"}}>
         <Stat icon={I.coins} label="Solde de trésorerie" value={fk(1250000)}/>
         <Stat icon={I.trend} label="Revenus (juin)" value={fcfa(358000)} tone="var(--green)"/>
         <Stat icon={I.down} label="Dépenses (juin)" value={fcfa(257000)} tone="var(--danger)" sub="dont 70% aliments" down/>
+      </div>
+      <div style={{display:"grid",gridTemplateColumns:mobile?"1fr":"1.5fr 1fr",gap:16,marginBottom:16}}>
+        <div style={{background:"var(--surface)",border:"1px solid var(--line)",borderRadius:18,padding:18,boxShadow:"var(--shadow-sm)"}}>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+            <strong>Flux de trésorerie · 6 mois</strong>
+            <span style={{display:"flex",gap:12,fontSize:11,color:"var(--ink3)"}}><span><span style={{color:"var(--ok)"}}>●</span> Entrées</span><span><span style={{color:"var(--danger)"}}>●</span> Sorties</span></span></div>
+          <div style={{display:"flex",alignItems:"flex-end",gap:mobile?10:18,height:130,marginTop:16}}>
+            {[[300,210],[340,250],[290,230],[360,260],[330,240],[358,257]].map(([i,o],k)=>{const mx=360;
+              return <div key={k} style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:6}}>
+                <div style={{display:"flex",gap:3,alignItems:"flex-end",height:100,width:"100%",justifyContent:"center"}}>
+                  <div style={{width:mobile?7:11,height:(i/mx*100)+"%",background:"var(--ok)",borderRadius:"4px 4px 0 0"}}/>
+                  <div style={{width:mobile?7:11,height:(o/mx*100)+"%",background:"var(--danger)",borderRadius:"4px 4px 0 0",opacity:.85}}/>
+                </div>
+                <span style={{fontSize:10.5,color:"var(--ink3)",fontWeight:600}}>{["Jan","Fév","Mar","Avr","Mai","Jun"][k]}</span>
+              </div>;})}
+          </div>
+        </div>
+        <div style={{background:"var(--surface)",border:"1px solid var(--line)",borderRadius:18,padding:18,boxShadow:"var(--shadow-sm)"}}>
+          <strong>Répartition des dépenses</strong>
+          <div style={{marginTop:14,display:"flex",flexDirection:"column",gap:12}}>
+            {[["Aliments",70,"var(--danger)"],["Cheptel",14,"var(--amber)"],["Santé",9,"var(--blue)"],["Autres",7,"var(--neutral)"]].map(([l,v,c],i)=>(
+              <div key={i}>
+                <div style={{display:"flex",justifyContent:"space-between",fontSize:12.5,marginBottom:5}}><span style={{color:"var(--ink2)",fontWeight:600}}>{l}</span><b>{v}%</b></div>
+                <Progress value={v} color={c}/>
+              </div>))}
+          </div>
+        </div>
       </div>
       <div style={{background:"var(--surface)",border:"1px solid var(--line)",borderRadius:18,overflow:"hidden",boxShadow:"var(--shadow-sm)"}}>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"14px 16px",borderBottom:"1px solid var(--line)"}}>
@@ -316,72 +411,119 @@ function Rapports({mobile}){
         <Stat icon={I.leaf} label="Sujets vendus" value="312"/>
         <Stat icon={I.drop} label="Mortalité globale" value="5,4%"/>
       </div>
-      <div style={{background:"var(--surface)",border:"1px solid var(--line)",borderRadius:18,padding:18,boxShadow:"var(--shadow-sm)"}}>
-        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}><strong>Résultat net mensuel</strong><Btn small ghost><I.chart size={15}/>Exporter</Btn></div>
-        <div style={{display:"flex",alignItems:"flex-end",gap:mobile?8:16,height:160,marginTop:18}}>
-          {bars.map((b,i)=>(<div key={i} style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:7}}>
-            <div className="hov" style={{width:"100%",height:b+"%",borderRadius:"7px 7px 0 0",background:i===5?"var(--blue)":"var(--blue-100)"}}/>
-            <span style={{fontSize:11,color:"var(--ink3)",fontWeight:600}}>{mois[i]}</span></div>))}
+      <div style={{display:"grid",gridTemplateColumns:mobile?"1fr":"1.5fr 1fr",gap:16}}>
+        <div style={{background:"var(--surface)",border:"1px solid var(--line)",borderRadius:18,padding:18,boxShadow:"var(--shadow-sm)"}}>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}><strong>Résultat net mensuel</strong><Btn small ghost><I.chart size={15}/>Exporter</Btn></div>
+          <div style={{display:"flex",alignItems:"flex-end",gap:mobile?8:16,height:160,marginTop:18}}>
+            {bars.map((b,i)=>(<div key={i} style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:7}}>
+              <div className="hov" style={{width:"100%",height:b+"%",borderRadius:"7px 7px 0 0",background:i===5?"var(--blue)":"var(--blue-100)"}}/>
+              <span style={{fontSize:11,color:"var(--ink3)",fontWeight:600}}>{mois[i]}</span></div>))}
+          </div>
+        </div>
+        <div style={{background:"var(--surface)",border:"1px solid var(--line)",borderRadius:18,padding:18,boxShadow:"var(--shadow-sm)"}}>
+          <strong>Répartition du chiffre d'affaires</strong>
+          <div style={{marginTop:14,display:"flex",flexDirection:"column",gap:12}}>
+            {[["Volaille",62,"var(--blue)"],["Œufs",18,"var(--amber)"],["Cultures",12,"var(--green)"],["Autres",8,"var(--neutral)"]].map(([l,v,c],i)=>(
+              <div key={i}>
+                <div style={{display:"flex",justifyContent:"space-between",fontSize:12.5,marginBottom:5}}><span style={{color:"var(--ink2)",fontWeight:600}}>{l}</span><b>{v}%</b></div>
+                <Progress value={v} color={c}/>
+              </div>))}
+          </div>
+          <div style={{marginTop:16,paddingTop:14,borderTop:"1px solid var(--line)",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+            <span style={{fontSize:12.5,color:"var(--ink3)"}}>CA total (6 mois)</span><b style={{fontSize:16,fontFamily:"'Outfit',sans-serif"}}>1,84 M</b></div>
         </div>
       </div>
     </div>);
 }
 
 /* ============================ SCREENS — CO-GÉRANT ============================ */
-function Saisie({mobile}){
+function Saisie({mobile,openModal}){
   const cards=[
-    {ic:I.alert,t:"Mortalité",d:"Enregistrer les pertes du jour",c:"var(--danger)",bg:"var(--danger-bg)"},
-    {ic:I.leaf,t:"Alimentation",d:"Quantité d'aliment distribuée",c:"var(--green)",bg:"var(--green-50)"},
-    {ic:I.syringe,t:"Santé",d:"Vaccination ou traitement",c:"var(--blue)",bg:"var(--blue-50)"},
-    {ic:I.coins,t:"Vente",d:"Sortie de sujets / produits",c:"var(--amber)",bg:"var(--warn-bg)"},
+    {ic:I.alert,t:"Mortalité",d:"Enregistrer les pertes du jour",c:"var(--danger)",bg:"var(--danger-bg)",m:"mortalite"},
+    {ic:I.leaf,t:"Alimentation",d:"Quantité d'aliment distribuée",c:"var(--green)",bg:"var(--green-50)",m:"alimentation"},
+    {ic:I.syringe,t:"Santé",d:"Vaccination ou traitement",c:"var(--blue)",bg:"var(--blue-50)",m:"vaccination"},
+    {ic:I.coins,t:"Vente",d:"Sortie de sujets / produits",c:"var(--amber)",bg:"var(--warn-bg)",m:"vente"},
+  ];
+  const recent=[
+    {ic:I.alert,c:"var(--danger)",t:"Mortalité — 3 sujets (B-024)",h:"il y a 12 min"},
+    {ic:I.leaf,c:"var(--green)",t:"Alimentation — 25 kg croissance (B-024)",h:"il y a 1 h"},
+    {ic:I.coins,c:"var(--amber)",t:"Vente — 4 plateaux d'œufs",h:"il y a 3 h"},
+    {ic:I.syringe,c:"var(--blue)",t:"Vaccination — Newcastle (B-025)",h:"hier"},
   ];
   return (
     <div className="fade">
       <h1 style={{fontSize:26}}>Saisie du jour</h1>
       <p style={{color:"var(--ink3)",margin:"4px 0 16px",fontSize:14}}>Bonjour Cécilia — enregistrez rapidement les opérations de terrain.</p>
+      <div style={{display:"grid",gridTemplateColumns:mobile?"1fr 1fr":"repeat(4,1fr)",gap:12,marginBottom:14}}>
+        <Stat icon={I.clip} label="Saisies aujourd'hui" value="7"/>
+        <Stat icon={I.alert} label="Mortalité du jour" value="3" tone="var(--danger)"/>
+        <Stat icon={I.leaf} label="Aliment distribué" value="25 kg" tone="var(--green)"/>
+        <Stat icon={I.coins} label="Ventes du jour" value="11 200"/>
+      </div>
       <div style={{display:"flex",alignItems:"center",gap:9,background:"var(--blue-50)",border:"1px solid var(--blue-100)",borderRadius:14,padding:"11px 14px",color:"var(--blue-700)",fontSize:12.5,marginBottom:18}}>
         <I.wifi size={17}/><span>Mode hors-ligne actif — vos saisies seront synchronisées à la reconnexion.</span></div>
-      <div style={{display:"grid",gridTemplateColumns:mobile?"1fr 1fr":"repeat(2,1fr)",gap:14}}>
+      <h3 style={{fontSize:16,margin:"0 0 10px"}}>Saisie rapide</h3>
+      <div style={{display:"grid",gridTemplateColumns:mobile?"1fr 1fr":"repeat(4,1fr)",gap:14}}>
         {cards.map((c,i)=>(
-          <button key={i} className="card-hov hov" style={{textAlign:"left",background:"var(--surface)",border:"1px solid var(--line)",borderRadius:18,padding:18,boxShadow:"var(--shadow-sm)"}}>
-            <span style={{width:46,height:46,borderRadius:13,display:"flex",alignItems:"center",justifyContent:"center",background:c.bg,color:c.c}}><c.ic size={22}/></span>
-            <div style={{fontWeight:700,fontSize:16,marginTop:12}}>{c.t}</div>
-            <div style={{fontSize:12.5,color:"var(--ink3)",marginTop:3}}>{c.d}</div>
-            <div style={{marginTop:14,color:"var(--blue)",fontWeight:600,fontSize:13,display:"inline-flex",alignItems:"center",gap:5}}>Saisir <I.plus size={15}/></div>
+          <button key={i} onClick={()=>openModal(c.m)} className="card-hov hov" style={{textAlign:"left",background:"var(--surface)",border:"1px solid var(--line)",borderRadius:18,padding:16,boxShadow:"var(--shadow-sm)"}}>
+            <span style={{width:44,height:44,borderRadius:13,display:"flex",alignItems:"center",justifyContent:"center",background:c.bg,color:c.c}}><c.ic size={21}/></span>
+            <div style={{fontWeight:700,fontSize:15,marginTop:11}}>{c.t}</div>
+            <div style={{marginTop:10,color:"var(--blue)",fontWeight:600,fontSize:12.5,display:"inline-flex",alignItems:"center",gap:5}}>Saisir <I.plus size={14}/></div>
           </button>))}
       </div>
-      <Section title="Bande active à suivre">
-        <div onClick={()=>{}} style={{background:"var(--surface)",border:"1px solid var(--line)",borderRadius:16,padding:15,display:"flex",alignItems:"center",gap:14,boxShadow:"var(--shadow-sm)"}}>
-          <div style={{width:54,height:54,borderRadius:12,overflow:"hidden",flexShrink:0}}><Photo seed="poulet-a" h={54} radius={0}/></div>
-          <div style={{flex:1}}><strong>B-024 · Poulets de chair</strong><div style={{fontSize:12.5,color:"var(--ink3)",marginTop:2}}>Jour 28/42 · 200 sujets · mortalité 4,8%</div></div>
-          <Badge m={BSTAT.encours}/>
+      <div style={{display:"grid",gridTemplateColumns:mobile?"1fr":"1fr 1fr",gap:16,marginTop:18}}>
+        <div>
+          <h3 style={{fontSize:16,margin:"0 0 10px"}}>Bande active à suivre</h3>
+          <div style={{background:"var(--surface)",border:"1px solid var(--line)",borderRadius:16,padding:15,display:"flex",alignItems:"center",gap:14,boxShadow:"var(--shadow-sm)"}}>
+            <div style={{width:54,height:54,borderRadius:12,overflow:"hidden",flexShrink:0}}><Photo seed="poulet-a" h={54} radius={0}/></div>
+            <div style={{flex:1}}><strong>B-024 · Poulets de chair</strong><div style={{fontSize:12.5,color:"var(--ink3)",marginTop:2}}>Jour 28/42 · 200 sujets · mortalité 4,8%</div></div>
+            <Badge m={BSTAT.encours}/>
+          </div>
         </div>
-      </Section>
+        <div>
+          <h3 style={{fontSize:16,margin:"0 0 10px"}}>Dernières saisies</h3>
+          <div style={{background:"var(--surface)",border:"1px solid var(--line)",borderRadius:16,padding:"6px 16px",boxShadow:"var(--shadow-sm)"}}>
+            {recent.map((r,i)=>(
+              <div key={i} style={{display:"flex",alignItems:"center",gap:11,padding:"11px 0",borderBottom:i<recent.length-1?"1px solid var(--line)":"none"}}>
+                <span style={{width:32,height:32,borderRadius:9,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",background:"var(--blue-50)",color:r.c}}><r.ic size={16}/></span>
+                <div style={{flex:1,minWidth:0,fontSize:13,fontWeight:500,color:"var(--ink2)"}}>{r.t}</div>
+                <span style={{fontSize:11,color:"var(--ink3)",whiteSpace:"nowrap"}}>{r.h}</span>
+              </div>))}
+          </div>
+        </div>
+      </div>
     </div>);
 }
 
-function Ventes({mobile}){
+function Ventes({mobile,openModal}){
   const v=[
     {ref:"V-118",cli:"Restaurant Le Manguier",art:"30 poulets vifs",date:"22 juin",montant:105000,statut:"payee"},
     {ref:"V-117",cli:"Mme Ngono",art:"4 plateaux d'œufs",date:"21 juin",montant:11200,statut:"payee"},
     {ref:"V-116",cli:"Boutique Essos",art:"15 régimes plantain",date:"20 juin",montant:30000,statut:"attente"},
+    {ref:"V-115",cli:"Hôtel La Falaise",art:"10 poulets · 2 miel",date:"19 juin",montant:41000,statut:"payee"},
   ];
   return (
     <div className="fade">
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:10}}>
         <div><h1 style={{fontSize:26}}>Ventes</h1><p style={{color:"var(--ink3)",margin:"4px 0 0",fontSize:14}}>Enregistrement et suivi des ventes.</p></div>
-        <Btn small><I.plus size={16}/>Nouvelle vente</Btn>
+        <Btn small onClick={()=>openModal("vente")}><I.plus size={16}/>Nouvelle vente</Btn>
       </div>
-      <div style={{display:"flex",flexDirection:"column",gap:12,marginTop:18}}>
-        {v.map(x=>(
-          <div key={x.ref} className="lift hov" style={{background:"var(--surface)",border:"1px solid var(--line)",borderRadius:16,padding:15,display:"flex",alignItems:"center",gap:14,flexDirection:mobile?"column":"row",boxShadow:"var(--shadow-sm)"}}>
-            <span style={{width:44,height:44,borderRadius:12,background:"var(--green-50)",color:"var(--green)",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}><I.receipt size={20}/></span>
-            <div style={{flex:1,minWidth:0,width:mobile?"100%":"auto"}}>
-              <div style={{display:"flex",gap:8,alignItems:"center",flexWrap:"wrap"}}><strong>{x.cli}</strong><span style={{color:"var(--ink3)",fontSize:12}}>{x.ref}</span></div>
-              <div style={{fontSize:13,color:"var(--ink2)",marginTop:3}}>{x.art} · {x.date}</div></div>
-            <div style={{textAlign:mobile?"left":"right",display:"flex",flexDirection:mobile?"row":"column",gap:8,alignItems:"center",width:mobile?"100%":"auto",justifyContent:"space-between"}}>
-              <strong>{fcfa(x.montant)}</strong>
-              <Badge m={x.statut==="payee"?{l:"Payée",c:"var(--ok)",bg:"var(--ok-bg)"}:{l:"En attente",c:"var(--warn)",bg:"var(--warn-bg)"}}/></div>
+      <div style={{display:"grid",gridTemplateColumns:mobile?"1fr 1fr":"repeat(4,1fr)",gap:12,margin:"18px 0"}}>
+        <Stat icon={I.coins} label="CA du jour" value="116 200" tone="var(--green)"/>
+        <Stat icon={I.receipt} label="Ventes (mois)" value="38"/>
+        <Stat icon={I.wallet} label="En attente" value="30 000" tone="var(--amber)"/>
+        <Stat icon={I.trend} label="Panier moyen" value="46 800"/>
+      </div>
+      <div style={{background:"var(--surface)",border:"1px solid var(--line)",borderRadius:18,overflow:"hidden",boxShadow:"var(--shadow-sm)"}}>
+        <div style={{padding:"14px 16px",borderBottom:"1px solid var(--line)"}}><strong>Ventes récentes</strong></div>
+        {v.map((x,i)=>(
+          <div key={x.ref} className="hov" style={{background:"var(--surface)",padding:"13px 16px",display:"flex",alignItems:"center",gap:13,borderBottom:i<v.length-1?"1px solid var(--line)":"none"}}>
+            <Avatar name={x.cli} size={40} green/>
+            <div style={{flex:1,minWidth:0}}>
+              <div style={{display:"flex",gap:8,alignItems:"center",flexWrap:"wrap"}}><strong style={{fontSize:14}}>{x.cli}</strong><span style={{color:"var(--ink3)",fontSize:11.5}}>{x.ref}</span></div>
+              <div style={{fontSize:12.5,color:"var(--ink3)",marginTop:2}}>{x.art} · {x.date}</div></div>
+            <Badge m={x.statut==="payee"?{l:"Payée",c:"var(--ok)",bg:"var(--ok-bg)"}:{l:"En attente",c:"var(--warn)",bg:"var(--warn-bg)"}}/>
+            <b style={{fontSize:13.5,minWidth:mobile?0:90,textAlign:"right",whiteSpace:"nowrap"}}>{fcfa(x.montant)}</b>
           </div>))}
       </div>
     </div>);
@@ -392,6 +534,12 @@ function Stocks({mobile}){
     <div className="fade">
       <h1 style={{fontSize:26}}>Stocks — Aliments & Intrants</h1>
       <p style={{color:"var(--ink3)",margin:"4px 0 16px",fontSize:14}}>Entrées/sorties et alertes de stock bas.</p>
+      <div style={{display:"grid",gridTemplateColumns:mobile?"1fr 1fr":"repeat(4,1fr)",gap:12,marginBottom:16}}>
+        <Stat icon={I.box} label="Références" value="4"/>
+        <Stat icon={I.alert} label="En stock bas" value="2" tone="var(--danger)"/>
+        <Stat icon={I.coins} label="Valeur du stock" value="385 000" sub="FCFA"/>
+        <Stat icon={I.down} label="Sorties (mois)" value="11 sacs"/>
+      </div>
       <div style={{display:"flex",alignItems:"center",gap:9,background:"var(--warn-bg)",border:"1px solid #fcd34d",borderRadius:14,padding:"11px 14px",color:"#92400e",fontSize:12.5,marginBottom:18}}>
         <I.alert size={17}/><span><b>2 articles en stock bas</b> — pensez à réapprovisionner l'aliment croissance et le vaccin Newcastle.</span></div>
       <div style={{display:"grid",gridTemplateColumns:mobile?"1fr":"1fr 1fr",gap:12}}>
@@ -471,7 +619,7 @@ function Boutique({mobile,go}){
     </div>);
 }
 
-function Panier({mobile}){
+function Panier({mobile,openModal}){
   const items=[{p:PRODUITS[0],q:3},{p:PRODUITS[2],q:2},{p:PRODUITS[5],q:1}];
   const total=items.reduce((s,x)=>s+x.p.prix*x.q,0);
   return (
@@ -493,27 +641,464 @@ function Panier({mobile}){
         <div style={{display:"flex",justifyContent:"space-between",fontSize:13.5,marginBottom:12}}><span style={{color:"var(--ink2)"}}>Livraison (Yaoundé)</span><b>1 500 FCFA</b></div>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",paddingTop:12,borderTop:"1px solid var(--line)"}}>
           <span style={{fontWeight:700}}>Total</span><span style={{fontSize:20,fontWeight:800,fontFamily:"'Outfit',sans-serif"}}>{fcfa(total+1500)}</span></div>
-        <div style={{marginTop:14}}><Btn full>Commander · Mobile Money <I.arrow size={17}/></Btn></div>
+        <div style={{marginTop:14}}><Btn full onClick={()=>openModal("paiement")}>Commander · Mobile Money <I.arrow size={17}/></Btn></div>
       </div>
     </div>);
 }
 
 function Commandes({mobile}){
   const cmds=[
-    {ref:"#CMD-1042",art:"3 poulets vifs · 2 plateaux œufs",date:"22 juin",montant:14100,statut:"Livrée",c:"var(--ok)",bg:"var(--ok-bg)"},
-    {ref:"#CMD-1031",art:"1 pot de miel · 5 régimes plantain",date:"14 juin",montant:13000,statut:"En préparation",c:"var(--warn)",bg:"var(--warn-bg)"},
+    {ref:"#CMD-1042",seed:"chair",art:"3 poulets vifs · 2 plateaux œufs",date:"22 juin",montant:14100,step:2,statut:"En livraison",c:"var(--info)",bg:"var(--info-bg)"},
+    {ref:"#CMD-1031",seed:"miel",art:"1 pot de miel · 5 régimes plantain",date:"14 juin",montant:13000,step:3,statut:"Livrée",c:"var(--ok)",bg:"var(--ok-bg)"},
+  ];
+  const STEPS=["Confirmée","Préparation","En route","Livrée"];
+  return (
+    <div className="fade" style={{maxWidth:720,margin:"0 auto"}}>
+      <h1 style={{fontSize:26,marginBottom:4}}>Mes commandes</h1>
+      <p style={{color:"var(--ink3)",fontSize:14,margin:"0 0 16px"}}>Suivez vos commandes en temps réel.</p>
+      <div style={{display:"flex",flexDirection:"column",gap:14}}>
+        {cmds.map(c=>(
+          <div key={c.ref} className="lift hov" style={{background:"var(--surface)",border:"1px solid var(--line)",borderRadius:18,padding:16,boxShadow:"var(--shadow-sm)"}}>
+            <div style={{display:"flex",gap:13,alignItems:"center"}}>
+              <div style={{width:52,height:52,borderRadius:13,overflow:"hidden",flexShrink:0}}><Photo seed={c.seed} h={52} radius={0}/></div>
+              <div style={{flex:1,minWidth:0}}>
+                <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}><strong style={{fontSize:14.5}}>{c.ref}</strong><Badge m={{l:c.statut,c:c.c,bg:c.bg}}/></div>
+                <div style={{fontSize:12.5,color:"var(--ink2)",marginTop:3}}>{c.art}</div></div>
+              <b style={{fontSize:14,whiteSpace:"nowrap"}}>{fcfa(c.montant)}</b>
+            </div>
+            <div style={{display:"flex",alignItems:"center",marginTop:16}}>
+              {STEPS.map((s,i)=>(
+                <React.Fragment key={i}>
+                  <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:5}}>
+                    <span style={{width:24,height:24,borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",background:i<=c.step?"var(--blue)":"var(--neutral-bg)",color:i<=c.step?"#fff":"var(--ink3)"}}>{i<c.step?<I.check size={13}/>:<span style={{fontSize:11,fontWeight:700}}>{i+1}</span>}</span>
+                    {!mobile&&<span style={{fontSize:10,color:i<=c.step?"var(--blue)":"var(--ink3)",fontWeight:600}}>{s}</span>}
+                  </div>
+                  {i<STEPS.length-1&&<div style={{flex:1,height:2,background:i<c.step?"var(--blue)":"var(--line)",margin:"0 4px",marginBottom:mobile?0:18}}/>}
+                </React.Fragment>))}
+            </div>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",borderTop:"1px solid var(--line)",marginTop:14,paddingTop:11}}>
+              <span style={{fontSize:12,color:"var(--ink3)"}}>Commandé le {c.date}</span>
+              <button className="hov" style={{color:"var(--blue)",fontWeight:600,fontSize:12.5,display:"inline-flex",alignItems:"center",gap:4}}>Détails <I.arrow size={14}/></button></div>
+          </div>))}
+      </div>
+    </div>);
+}
+
+/* ============================ ÉLEVAGE PORCS (Phase 2) ============================ */
+function Porcs({mobile,openModal}){
+  const data=[
+    {t:"Truie #T-02 · portée",sub:"9 porcelets · sevrage dans 12 j",seed:"porc-a",bl:"Allaitement",bc:"var(--info)",bbg:"var(--info-bg)"},
+    {t:"Parc d'engraissement",sub:"14 porcs · poids moyen 62 kg",seed:"porc-b",bl:"Engraissement",bc:"var(--amber)",bbg:"var(--warn-bg)"},
+    {t:"Truie #T-01",sub:"Gestation · mise bas prévue 10 juil.",seed:"porc-c",bl:"Gestation",bc:"var(--neutral)",bbg:"var(--neutral-bg)"},
   ];
   return (
-    <div className="fade" style={{maxWidth:680,margin:"0 auto"}}>
-      <h1 style={{fontSize:26,marginBottom:14}}>Mes commandes</h1>
-      <div style={{display:"flex",flexDirection:"column",gap:12}}>
-        {cmds.map(c=>(
-          <div key={c.ref} className="lift hov" style={{background:"var(--surface)",border:"1px solid var(--line)",borderRadius:16,padding:16,boxShadow:"var(--shadow-sm)"}}>
-            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:8}}>
-              <strong>{c.ref}</strong><Badge m={{l:c.statut,c:c.c,bg:c.bg}}/></div>
-            <div style={{fontSize:13,color:"var(--ink2)",margin:"8px 0"}}>{c.art}</div>
-            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",borderTop:"1px solid var(--line)",paddingTop:10}}>
-              <span style={{fontSize:12.5,color:"var(--ink3)"}}>{c.date}</span><b>{fcfa(c.montant)}</b></div>
+    <div className="fade">
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:10}}>
+        <div><h1 style={{fontSize:26}}>Élevage — Porcs</h1><p style={{color:"var(--ink3)",margin:"4px 0 0",fontSize:14}}>Portées, reproduction et engraissement.</p></div>
+        <Btn small onClick={()=>openModal("porcs")}><I.plus size={16}/>Nouvelle portée</Btn>
+      </div>
+      <div style={{display:"grid",gridTemplateColumns:mobile?"1fr 1fr":"repeat(4,1fr)",gap:12,margin:"18px 0"}}>
+        <Stat icon={I.pig} label="Truies" value="2"/>
+        <Stat icon={I.users} label="Porcelets" value="9" tone="var(--green)"/>
+        <Stat icon={I.box} label="À l'engrais" value="14"/>
+        <Stat icon={I.trend} label="Poids moyen" value="62 kg"/>
+      </div>
+      <div style={{display:"grid",gridTemplateColumns:mobile?"1fr":"repeat(auto-fill,minmax(280px,1fr))",gap:16}}>
+        {data.map((d,i)=>(
+          <div key={i} className="card-hov hov" style={{background:"var(--surface)",border:"1px solid var(--line)",borderRadius:18,overflow:"hidden",boxShadow:"var(--shadow-sm)"}}>
+            <Photo seed={d.seed} h={120} radius={0}/>
+            <div style={{padding:15}}>
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:8}}>
+                <strong style={{fontSize:14.5}}>{d.t}</strong><span style={{background:d.bbg,color:d.bc,fontSize:11.5,fontWeight:600,padding:"4px 10px",borderRadius:999,whiteSpace:"nowrap"}}>{d.bl}</span></div>
+              <div style={{color:"var(--ink3)",fontSize:12.5,marginTop:6}}>{d.sub}</div>
+            </div>
+          </div>))}
+      </div>
+    </div>);
+}
+
+/* ============================ CULTURES VIVRIÈRES (Phase 2) ============================ */
+function Cultures({mobile,openModal}){
+  const data=[
+    {nom:"Maïs",parc:"Parcelle A",surf:"0,5 ha",semis:"12 mars",recolte:"juil. 2026",prog:72,seed:"mais"},
+    {nom:"Manioc",parc:"Parcelle B",surf:"1 ha",semis:"05 févr.",recolte:"déc. 2026",prog:45,seed:"manioc-c"},
+    {nom:"Plantain",parc:"Parcelle C",surf:"0,8 ha",semis:"20 janv.",recolte:"août 2026",prog:60,seed:"plantain-c"},
+  ];
+  return (
+    <div className="fade">
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:10}}>
+        <div><h1 style={{fontSize:26}}>Cultures vivrières</h1><p style={{color:"var(--ink3)",margin:"4px 0 0",fontSize:14}}>Parcelles, semis, récoltes et rendements.</p></div>
+        <Btn small onClick={()=>openModal("culture")}><I.plus size={16}/>Nouvelle culture</Btn>
+      </div>
+      <div style={{display:"grid",gridTemplateColumns:mobile?"1fr 1fr":"repeat(4,1fr)",gap:12,margin:"18px 0"}}>
+        <Stat icon={I.wheat} label="Parcelles" value="3"/>
+        <Stat icon={I.layers} label="Surface totale" value="2,3 ha"/>
+        <Stat icon={I.calendar} label="Prochaine récolte" value="Juil."/>
+        <Stat icon={I.trend} label="Rendement moyen" value="3,2 t/ha"/>
+      </div>
+      <div style={{display:"grid",gridTemplateColumns:mobile?"1fr":"repeat(auto-fill,minmax(280px,1fr))",gap:16}}>
+        {data.map((d,i)=>(
+          <div key={i} className="card-hov hov" style={{background:"var(--surface)",border:"1px solid var(--line)",borderRadius:18,overflow:"hidden",boxShadow:"var(--shadow-sm)"}}>
+            <Photo seed={d.seed} h={120} radius={0} label={d.parc}/>
+            <div style={{padding:15}}>
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}><strong style={{fontSize:15}}>{d.nom}</strong><span style={{fontSize:12,color:"var(--ink3)"}}>{d.surf}</span></div>
+              <div style={{display:"flex",gap:14,margin:"10px 0",fontSize:12.5,color:"var(--ink2)"}}>
+                <span><span style={{color:"var(--ink3)",fontSize:11}}>Semis</span><br/><b>{d.semis}</b></span>
+                <span><span style={{color:"var(--ink3)",fontSize:11}}>Récolte</span><br/><b>{d.recolte}</b></span>
+              </div>
+              <div style={{display:"flex",justifyContent:"space-between",fontSize:11.5,color:"var(--ink3)",marginBottom:5}}><span>Croissance</span><span>{d.prog}%</span></div>
+              <Progress value={d.prog} color="var(--green)"/>
+            </div>
+          </div>))}
+      </div>
+    </div>);
+}
+
+/* ============================ PHASE 3 — CONSOLIDATION ============================ */
+function RH({mobile,openModal}){
+  const staff=[
+    {n:"Jean Owona",p:"Ouvrier élevage",dep:"Élevage",c:"CDI",s:75000,pres:true},
+    {n:"Marie Abena",p:"Vendeuse",dep:"Ventes",c:"CDI",s:65000,pres:true},
+    {n:"Estelle Fouda",p:"Comptable",dep:"Administration",c:"CDI",s:90000,pres:true},
+    {n:"Paul Eto'o",p:"Ouvrier agricole",dep:"Cultures",c:"Saisonnier",s:60000,pres:false},
+  ];
+  const presents=staff.filter(s=>s.pres).length;
+  return (
+    <div className="fade">
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:10}}>
+        <div><h1 style={{fontSize:26}}>Personnel (RH)</h1><p style={{color:"var(--ink3)",margin:"4px 0 0",fontSize:14}}>Effectif, présences, contrats et paie.</p></div>
+        <Btn small onClick={()=>openModal("employe")}><I.plus size={16}/>Ajouter un employé</Btn>
+      </div>
+      <div style={{display:"grid",gridTemplateColumns:mobile?"1fr 1fr":"repeat(4,1fr)",gap:12,margin:"18px 0"}}>
+        <Stat icon={I.users} label="Effectif" value="4"/>
+        <Stat icon={I.coins} label="Masse salariale" value="290 000" sub="FCFA / mois"/>
+        <Stat icon={I.check} label="Présents aujourd'hui" value={presents+" / 4"} tone="var(--green)"/>
+        <Stat icon={I.calendar} label="Congés en cours" value="1"/>
+      </div>
+      <div style={{display:"grid",gridTemplateColumns:mobile?"1fr":"1.6fr 1fr",gap:16}}>
+        <div style={{background:"var(--surface)",border:"1px solid var(--line)",borderRadius:18,overflow:"hidden",boxShadow:"var(--shadow-sm)"}}>
+          <div style={{padding:"15px 16px",borderBottom:"1px solid var(--line)"}}><strong>Équipe</strong></div>
+          {staff.map((u,i)=>(
+            <div key={i} className="hov" style={{display:"flex",alignItems:"center",gap:13,padding:"12px 16px",borderBottom:i<staff.length-1?"1px solid var(--line)":"none"}}>
+              <div style={{position:"relative",flexShrink:0}}><Avatar name={u.n} size={42}/>
+                <span style={{position:"absolute",right:-1,bottom:-1,width:12,height:12,borderRadius:"50%",border:"2px solid var(--surface)",background:u.pres?"var(--green)":"var(--amber)"}}/></div>
+              <div style={{flex:1,minWidth:0}}><strong style={{fontSize:14}}>{u.n}</strong><div style={{fontSize:12,color:"var(--ink3)"}}>{u.p}</div></div>
+              {!mobile&&<span style={{fontSize:11.5,color:"var(--ink2)",background:"var(--neutral-bg)",padding:"3px 10px",borderRadius:999}}>{u.dep}</span>}
+              <span style={{background:u.c==="CDI"?"var(--ok-bg)":"var(--warn-bg)",color:u.c==="CDI"?"var(--ok)":"var(--amber)",fontSize:11,fontWeight:700,padding:"4px 10px",borderRadius:999}}>{u.c}</span>
+              {!mobile&&<b style={{fontSize:13.5,minWidth:88,textAlign:"right"}}>{fcfa(u.s)}</b>}
+            </div>))}
+        </div>
+        <div style={{display:"flex",flexDirection:"column",gap:16}}>
+          <div style={{background:"var(--surface)",border:"1px solid var(--line)",borderRadius:18,padding:18,boxShadow:"var(--shadow-sm)"}}>
+            <strong>Présence du jour</strong>
+            <div style={{display:"flex",alignItems:"baseline",gap:8,margin:"10px 0 8px"}}>
+              <span style={{fontSize:30,fontWeight:800,fontFamily:"'Outfit',sans-serif",color:"var(--green)"}}>{Math.round(presents/4*100)}%</span>
+              <span style={{fontSize:12.5,color:"var(--ink3)"}}>{presents} présents · {4-presents} en congé</span></div>
+            <Progress value={presents/4*100} color="var(--green)"/>
+          </div>
+          <div style={{background:"var(--surface)",border:"1px solid var(--line)",borderRadius:18,padding:18,boxShadow:"var(--shadow-sm)"}}>
+            <strong>Congés à venir</strong>
+            <div style={{display:"flex",alignItems:"center",gap:11,marginTop:12}}>
+              <Avatar name="Paul Eto'o" size={38}/>
+              <div style={{flex:1}}><div style={{fontSize:13.5,fontWeight:600}}>Paul Eto'o</div><div style={{fontSize:11.5,color:"var(--ink3)"}}>Congé · 24 → 28 juin</div></div>
+              <span style={{background:"var(--warn-bg)",color:"var(--amber)",fontSize:11,fontWeight:700,padding:"4px 10px",borderRadius:999}}>5 j</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>);
+}
+
+const TIER={VIP:{c:"#92400e",bg:"linear-gradient(135deg,#FDE68A,#F59E0B)"},Régulier:{c:"var(--blue-700)",bg:"var(--blue-50)"},Nouveau:{c:"var(--green)",bg:"var(--green-50)"}};
+function CRM({mobile}){
+  const clients=[
+    {n:"Restaurant Le Manguier",tier:"VIP",cmd:12,ca:1200000,last:"il y a 2 j"},
+    {n:"Hôtel La Falaise",tier:"VIP",cmd:9,ca:980000,last:"il y a 5 j"},
+    {n:"Boutique Essos",tier:"Régulier",cmd:8,ca:640000,last:"il y a 1 sem."},
+    {n:"Mme Ngono",tier:"Régulier",cmd:5,ca:95000,last:"il y a 3 j"},
+    {n:"Paul Mbarga",tier:"Nouveau",cmd:1,ca:14100,last:"hier"},
+  ];
+  const fourn=[
+    {n:"Provende du Centre",cat:"Aliments volaille",rel:4.5},
+    {n:"AgroVet Yaoundé",cat:"Vaccins & vétérinaire",rel:4.8},
+    {n:"Semences Mfou",cat:"Semences & intrants",rel:4.0},
+  ];
+  return (
+    <div className="fade">
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:10}}>
+        <div><h1 style={{fontSize:26}}>Clients & Fournisseurs</h1><p style={{color:"var(--ink3)",margin:"4px 0 0",fontSize:14}}>Relation client (CRM) et fournisseurs (SRM).</p></div>
+        <Btn small><I.plus size={15}/>Nouveau client</Btn>
+      </div>
+      <div style={{display:"grid",gridTemplateColumns:mobile?"1fr 1fr":"repeat(4,1fr)",gap:12,margin:"18px 0"}}>
+        <Stat icon={I.user} label="Clients" value="42" sub="+5 ce mois"/>
+        <Stat icon={I.contact} label="Fournisseurs" value="8"/>
+        <Stat icon={I.coins} label="CA clients (mois)" value="1,9 M" tone="var(--green)"/>
+        <Stat icon={I.receipt} label="Encours à payer" value="95 000" tone="var(--amber)"/>
+      </div>
+      <div style={{display:"grid",gridTemplateColumns:mobile?"1fr":"1.5fr 1fr",gap:16}}>
+        <div style={{background:"var(--surface)",border:"1px solid var(--line)",borderRadius:18,overflow:"hidden",boxShadow:"var(--shadow-sm)"}}>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"15px 16px",borderBottom:"1px solid var(--line)"}}>
+            <strong>Top clients</strong><span style={{fontSize:12,color:"var(--ink3)"}}>par chiffre d'affaires</span></div>
+          {clients.map((c,i)=>(
+            <div key={i} className="hov" style={{display:"flex",alignItems:"center",gap:12,padding:"12px 16px",borderBottom:i<clients.length-1?"1px solid var(--line)":"none"}}>
+              <Avatar name={c.n} size={42}/>
+              <div style={{flex:1,minWidth:0}}>
+                <div style={{display:"flex",alignItems:"center",gap:7,flexWrap:"wrap"}}><strong style={{fontSize:13.5}}>{c.n}</strong>
+                  <span style={{background:TIER[c.tier].bg,color:TIER[c.tier].c,fontSize:10,fontWeight:800,padding:"2px 8px",borderRadius:999}}>{c.tier}</span></div>
+                <div style={{fontSize:11.5,color:"var(--ink3)",marginTop:2}}>{c.cmd} commandes · dernière {c.last}</div></div>
+              <div style={{textAlign:"right"}}><b style={{fontSize:13.5}}>{fcfa(c.ca)}</b>
+                {!mobile&&<div><button className="lift hov" style={{marginTop:5,border:"1px solid var(--line)",borderRadius:9,padding:"5px 7px",color:"var(--blue)",display:"inline-flex"}}><I.mail size={14}/></button></div>}</div>
+            </div>))}
+        </div>
+        <div style={{background:"var(--surface)",border:"1px solid var(--line)",borderRadius:18,padding:16,boxShadow:"var(--shadow-sm)",height:"fit-content"}}>
+          <strong>Fournisseurs</strong>
+          <div style={{marginTop:12,display:"flex",flexDirection:"column",gap:14}}>
+            {fourn.map((f,i)=>(
+              <div key={i} style={{display:"flex",alignItems:"center",gap:11}}>
+                <Avatar name={f.n} size={38} green/>
+                <div style={{flex:1,minWidth:0}}><div style={{fontSize:13.5,fontWeight:600,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{f.n}</div>
+                  <div style={{fontSize:11.5,color:"var(--ink3)"}}>{f.cat}</div>
+                  <div style={{marginTop:2,fontSize:11.5,color:"var(--ink3)"}}><Star5 n={f.rel}/> {f.rel} fiabilité</div></div>
+              </div>))}
+          </div>
+        </div>
+      </div>
+    </div>);
+}
+
+function Cacao({mobile,openModal}){
+  const data=[{nom:"Cacaoyère Nord",surf:"2 ha",etat:"Récolte en cours",prog:80,seed:"cacao-a"},{nom:"Cacaoyère Sud",surf:"1,5 ha",etat:"Séchage",prog:55,seed:"cacao-b"}];
+  return (
+    <div className="fade">
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:10}}>
+        <div><h1 style={{fontSize:26}}>Cacao & Agroforesterie</h1><p style={{color:"var(--ink3)",margin:"4px 0 0",fontSize:14}}>Parcelles, récoltes, séchage et transformation.</p></div>
+        <Btn small onClick={()=>openModal("culture")}><I.plus size={16}/>Nouvelle parcelle</Btn>
+      </div>
+      <div style={{display:"grid",gridTemplateColumns:mobile?"1fr 1fr":"repeat(4,1fr)",gap:12,margin:"18px 0"}}>
+        <Stat icon={I.bean} label="Parcelles" value="2"/>
+        <Stat icon={I.layers} label="Surface" value="3,5 ha"/>
+        <Stat icon={I.box} label="Fèves séchées" value="420 kg" tone="var(--green)"/>
+        <Stat icon={I.coins} label="Prix moyen" value="1 500 / kg"/>
+      </div>
+      <div style={{display:"grid",gridTemplateColumns:mobile?"1fr":"repeat(auto-fill,minmax(280px,1fr))",gap:16}}>
+        {data.map((d,i)=>(
+          <div key={i} className="card-hov hov" style={{background:"var(--surface)",border:"1px solid var(--line)",borderRadius:18,overflow:"hidden",boxShadow:"var(--shadow-sm)"}}>
+            <Photo seed={d.seed} h={120} radius={0} label={d.surf}/>
+            <div style={{padding:15}}>
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}><strong style={{fontSize:15}}>{d.nom}</strong><span style={{fontSize:12,color:"var(--green)",fontWeight:600}}>{d.etat}</span></div>
+              <div style={{marginTop:12}}><Progress value={d.prog} color="#8B5E34"/></div>
+            </div>
+          </div>))}
+      </div>
+    </div>);
+}
+
+function Ecommerce({mobile}){
+  const orders=[
+    {id:"#CMD-1043",cli:"Restaurant Le Manguier",items:"30 poulets vifs",total:105000,st:"Payée",c:"var(--ok)",bg:"var(--ok-bg)"},
+    {id:"#CMD-1042",cli:"Mme Ngono",items:"4 plateaux d'œufs",total:11200,st:"Expédiée",c:"var(--info)",bg:"var(--info-bg)"},
+    {id:"#CMD-1041",cli:"Boutique Essos",items:"15 régimes plantain",total:30000,st:"En préparation",c:"var(--amber)",bg:"var(--warn-bg)"},
+    {id:"#CMD-1040",cli:"Hôtel La Falaise",items:"2 miel · 10 poulets",total:41000,st:"Payée",c:"var(--ok)",bg:"var(--ok-bg)"},
+  ];
+  const best=[{p:PRODUITS[0],sold:128,rev:448000},{p:PRODUITS[2],sold:86,rev:240800},{p:PRODUITS[5],sold:42,rev:126000}];
+  const maxSold=128; const bars=[40,55,48,72,60,88,95]; const days=["Lun","Mar","Mer","Jeu","Ven","Sam","Dim"];
+  return (
+    <div className="fade">
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:10}}>
+        <div><h1 style={{fontSize:26}}>E-commerce</h1><p style={{color:"var(--ink3)",margin:"4px 0 0",fontSize:14}}>Pilotez votre boutique en ligne GICETECHA.</p></div>
+        <div style={{display:"flex",gap:8}}><Btn small ghost><I.store size={15}/>Voir la boutique</Btn><Btn small><I.plus size={15}/>Ajouter un produit</Btn></div>
+      </div>
+      <div style={{display:"grid",gridTemplateColumns:mobile?"1fr 1fr":"repeat(4,1fr)",gap:12,margin:"18px 0"}}>
+        <Stat icon={I.coins} label="Ventes en ligne (30j)" value="1,27 M" sub="↑ 24%" tone="var(--green)"/>
+        <Stat icon={I.cart} label="Commandes" value="86" sub="↑ 12%"/>
+        <Stat icon={I.receipt} label="Panier moyen" value="14 800"/>
+        <Stat icon={I.trend} label="Conversion" value="6,9%" sub="↑ 0,8 pt"/>
+      </div>
+      <div style={{display:"grid",gridTemplateColumns:mobile?"1fr":"1.6fr 1fr",gap:16}}>
+        <div style={{display:"flex",flexDirection:"column",gap:16}}>
+          <div style={{background:"var(--surface)",border:"1px solid var(--line)",borderRadius:18,padding:18,boxShadow:"var(--shadow-sm)"}}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}>
+              <div><div style={{fontSize:12.5,color:"var(--ink3)",fontWeight:600}}>Chiffre d'affaires · 7 derniers jours</div><div style={{fontSize:24,fontWeight:800,fontFamily:"'Outfit',sans-serif",marginTop:2}}>318 400 FCFA</div></div>
+              <span style={{background:"var(--ok-bg)",color:"var(--ok)",fontSize:12,fontWeight:700,padding:"4px 10px",borderRadius:999,display:"inline-flex",gap:4,alignItems:"center"}}><I.trend size={13}/>+18%</span>
+            </div>
+            <div style={{display:"flex",alignItems:"flex-end",gap:mobile?8:14,height:120,marginTop:18}}>
+              {bars.map((b,i)=>(<div key={i} style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:7}}>
+                <div className="hov" style={{width:"100%",height:b+"%",borderRadius:"7px 7px 0 0",background:i===6?"var(--blue)":"var(--blue-100)"}}/>
+                <span style={{fontSize:10,color:"var(--ink3)",fontWeight:600}}>{days[i]}</span></div>))}
+            </div>
+          </div>
+          <div style={{background:"var(--surface)",border:"1px solid var(--line)",borderRadius:18,overflow:"hidden",boxShadow:"var(--shadow-sm)"}}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"15px 16px",borderBottom:"1px solid var(--line)"}}>
+              <strong>Commandes récentes</strong><button className="hov" style={{color:"var(--blue)",fontWeight:600,fontSize:13}}>Tout voir</button></div>
+            {orders.map((o,i)=>(
+              <div key={i} style={{display:"flex",alignItems:"center",gap:12,padding:"12px 16px",borderBottom:i<orders.length-1?"1px solid var(--line)":"none"}}>
+                <div style={{flex:1,minWidth:0}}>
+                  <div style={{display:"flex",gap:8,alignItems:"center",flexWrap:"wrap"}}><strong style={{fontSize:13.5}}>{o.cli}</strong><span style={{fontSize:11.5,color:"var(--ink3)"}}>{o.id}</span></div>
+                  <div style={{fontSize:12,color:"var(--ink3)",marginTop:2}}>{o.items}</div></div>
+                <span style={{background:o.bg,color:o.c,fontSize:11,fontWeight:700,padding:"4px 10px",borderRadius:999,whiteSpace:"nowrap"}}>{o.st}</span>
+                <b style={{fontSize:13.5,minWidth:84,textAlign:"right"}}>{fcfa(o.total)}</b>
+              </div>))}
+          </div>
+        </div>
+        <div style={{display:"flex",flexDirection:"column",gap:16}}>
+          <div style={{background:"var(--surface)",border:"1px solid var(--line)",borderRadius:18,padding:18,boxShadow:"var(--shadow-sm)"}}>
+            <strong>Meilleures ventes</strong>
+            <div style={{marginTop:14,display:"flex",flexDirection:"column",gap:14}}>
+              {best.map((b,i)=>(
+                <div key={i} style={{display:"flex",gap:11,alignItems:"center"}}>
+                  <div style={{width:46,height:46,borderRadius:12,overflow:"hidden",flexShrink:0}}><Photo seed={b.p.seed} h={46} radius={0}/></div>
+                  <div style={{flex:1,minWidth:0}}>
+                    <div style={{fontSize:13,fontWeight:600,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{b.p.nom}</div>
+                    <div style={{fontSize:11.5,color:"var(--ink3)",margin:"3px 0 5px"}}>{b.sold} vendus · {fcfa(b.rev)}</div>
+                    <Progress value={Math.round(b.sold/maxSold*100)}/>
+                  </div>
+                </div>))}
+            </div>
+          </div>
+          <div style={{borderRadius:18,padding:"18px",color:"#fff",background:"linear-gradient(135deg,#5B21B6,#2563EB)",boxShadow:"var(--shadow-sm)",position:"relative",overflow:"hidden"}}>
+            <div style={{position:"absolute",right:-8,top:-8,opacity:.18}}><I.tag size={90}/></div>
+            <div style={{position:"relative"}}>
+              <span style={{background:"rgba(255,255,255,.2)",fontSize:11,fontWeight:700,padding:"3px 10px",borderRadius:999}}>CAMPAGNE ACTIVE</span>
+              <div style={{fontSize:16,fontWeight:800,fontFamily:"'Outfit',sans-serif",marginTop:10}}>Promo « Poulet de fête »</div>
+              <div style={{fontSize:12.5,opacity:.92,marginTop:3}}>−10% sur le poulet vif · jusqu'au 30 juin</div>
+              <div style={{display:"flex",gap:16,marginTop:14}}>
+                <div><div style={{fontSize:18,fontWeight:800,fontFamily:"'Outfit',sans-serif"}}>32</div><div style={{fontSize:10.5,opacity:.85}}>ventes</div></div>
+                <div><div style={{fontSize:18,fontWeight:800,fontFamily:"'Outfit',sans-serif"}}>+18%</div><div style={{fontSize:10.5,opacity:.85}}>panier</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>);
+}
+
+function Autres({mobile,openModal}){
+  const data=[
+    {nom:"Pisciculture",kw:"fish",seed:"tilapia",ic:I.fish,eff:"480 tilapias",lieu:"Étang principal",bl:"Croissance",bc:"var(--info)",bbg:"var(--info-bg)",prog:55,metric:"Récolte dans 6 sem."},
+    {nom:"Apiculture",kw:"bees",seed:"ruches",ic:I.drop,eff:"12 ruches",lieu:"Rucher Sud",bl:"Production",bc:"var(--amber)",bbg:"var(--warn-bg)",prog:70,metric:"28 kg de miel ce mois"},
+    {nom:"Élevage de lapins",kw:"rabbit",seed:"lapins",ic:I.egg,eff:"6 femelles · 22 lapereaux",lieu:"Clapier",bl:"Reproduction",bc:"var(--green)",bbg:"var(--green-50)",prog:40,metric:"Sevrage en cours"},
+    {nom:"Dindes",kw:"turkey",seed:"dindes",ic:I.leaf,eff:"40 sujets",lieu:"Parcours arboré",bl:"Engraissement",bc:"#7C3AED",bbg:"#F1EBFC",prog:60,metric:"3,2 kg de poids moyen"},
+  ];
+  return (
+    <div className="fade">
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:10}}>
+        <div><h1 style={{fontSize:26}}>Autres élevages</h1><p style={{color:"var(--ink3)",margin:"4px 0 0",fontSize:14}}>Pisciculture, apiculture, lapins, dindes…</p></div>
+        <Btn small onClick={()=>openModal("bande")}><I.plus size={16}/>Nouvel élevage</Btn>
+      </div>
+      <div style={{display:"grid",gridTemplateColumns:mobile?"1fr 1fr":"repeat(4,1fr)",gap:12,margin:"18px 0"}}>
+        <Stat icon={I.fish} label="Activités annexes" value="4"/>
+        <Stat icon={I.drop} label="Miel (mois)" value="28 kg" tone="var(--amber)"/>
+        <Stat icon={I.users} label="Tilapias" value="480"/>
+        <Stat icon={I.trend} label="Diversification CA" value="14%" tone="var(--green)"/>
+      </div>
+      <div style={{display:"grid",gridTemplateColumns:mobile?"1fr":"repeat(auto-fill,minmax(250px,1fr))",gap:16}}>
+        {data.map((d,i)=>(
+          <div key={i} className="card-hov hov" style={{background:"var(--surface)",border:"1px solid var(--line)",borderRadius:18,overflow:"hidden",boxShadow:"var(--shadow-sm)"}}>
+            <div style={{position:"relative"}}><Photo seed={d.seed} kw={d.kw} h={130} radius={0}/>
+              <span style={{position:"absolute",top:10,left:10,background:d.bbg,color:d.bc,fontSize:10.5,fontWeight:700,padding:"3px 10px",borderRadius:999}}>{d.bl}</span></div>
+            <div style={{padding:15}}>
+              <div style={{display:"flex",alignItems:"center",gap:8}}><span style={{color:d.bc,display:"flex"}}><d.ic size={18}/></span><strong style={{fontSize:15}}>{d.nom}</strong></div>
+              <div style={{fontSize:12.5,color:"var(--ink2)",margin:"7px 0 2px"}}>{d.eff}</div>
+              <div style={{fontSize:11.5,color:"var(--ink3)",display:"flex",alignItems:"center",gap:4}}><I.pin size={12}/>{d.lieu}</div>
+              <div style={{margin:"12px 0 6px"}}><Progress value={d.prog} color={d.bc}/></div>
+              <div style={{fontSize:11.5,color:"var(--ink3)"}}>{d.metric}</div>
+            </div>
+          </div>))}
+      </div>
+    </div>);
+}
+
+function BI({mobile}){
+  const acts=[["Volaille",92,"var(--blue)"],["Porcs",70,"#7C3AED"],["Cultures",55,"var(--green)"],["Cacao",80,"#8B5E34"],["Autres",40,"var(--amber)"]];
+  return (
+    <div className="fade">
+      <h1 style={{fontSize:26}}>Pilotage & Business Intelligence</h1>
+      <p style={{color:"var(--ink3)",margin:"4px 0 16px",fontSize:14}}>Indicateurs consolidés de toutes les activités.</p>
+      <div style={{display:"grid",gridTemplateColumns:mobile?"1fr 1fr":"repeat(4,1fr)",gap:12,marginBottom:16}}>
+        <Stat icon={I.coins} label="CA consolidé (an)" value="14,6 M" tone="var(--green)"/>
+        <Stat icon={I.trend} label="Rentabilité globale" value="31%"/>
+        <Stat icon={I.layers} label="Activités actives" value="6"/>
+        <Stat icon={I.pie} label="Activité n°1" value="Volaille" sub="38% du CA"/>
+      </div>
+      <div style={{background:"var(--surface)",border:"1px solid var(--line)",borderRadius:18,padding:18,boxShadow:"var(--shadow-sm)"}}>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}><strong>Rentabilité par activité</strong><Btn small ghost><I.chart size={15}/>Exporter</Btn></div>
+        <div style={{marginTop:16,display:"flex",flexDirection:"column",gap:12}}>
+          {acts.map(([nom,v,c],i)=>(
+            <div key={i}>
+              <div style={{display:"flex",justifyContent:"space-between",fontSize:12.5,marginBottom:5}}><span style={{color:"var(--ink2)",fontWeight:600}}>{nom}</span><b>{v}%</b></div>
+              <Progress value={v} color={c}/>
+            </div>))}
+        </div>
+      </div>
+    </div>);
+}
+
+const Star5=({n})=>(<span style={{color:"#F59E0B",fontSize:12,letterSpacing:.5,whiteSpace:"nowrap"}}>{"★".repeat(Math.round(n))}<span style={{color:"var(--line)"}}>{"★".repeat(5-Math.round(n))}</span></span>);
+const NIV={Débutant:{c:"var(--ok)",bg:"var(--ok-bg)"},Intermédiaire:{c:"var(--amber)",bg:"var(--warn-bg)"},Avancé:{c:"#7C3AED",bg:"#F1EBFC"}};
+function Formation({mobile,openModal}){
+  const courses=[
+    {nom:"Aviculture moderne : du poussin à la vente",cat:"Élevage",f:"Gildas Mebada",note:4.8,avis:124,eleves:18,lecons:24,niveau:"Débutant",prog:65,seed:"c1"},
+    {nom:"Gérer une ferme agricole rentable",cat:"Gestion",f:"Cécilia M.",note:4.9,avis:88,eleves:24,lecons:18,niveau:"Intermédiaire",prog:40,seed:"c2"},
+    {nom:"Transformation agroalimentaire",cat:"Transformation",f:"Dr. Mballa",note:4.6,avis:52,eleves:12,lecons:15,niveau:"Avancé",prog:0,seed:"c3"},
+    {nom:"Pisciculture en étang",cat:"Élevage",f:"Gildas Mebada",note:4.7,avis:33,eleves:9,lecons:12,niveau:"Débutant",prog:0,seed:"c4"},
+  ];
+  const feat=courses[0];
+  return (
+    <div className="fade">
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:10}}>
+        <div><h1 style={{fontSize:26}}>École GICETECHA</h1><p style={{color:"var(--ink3)",margin:"4px 0 0",fontSize:14}}>Apprenez l'agropastoral avec des praticiens.</p></div>
+        <Btn small onClick={()=>openModal("session")}><I.plus size={16}/>Nouveau cours</Btn>
+      </div>
+      <div style={{display:"grid",gridTemplateColumns:mobile?"1fr 1fr":"repeat(4,1fr)",gap:12,margin:"18px 0"}}>
+        <Stat icon={I.book} label="Cours" value="12"/>
+        <Stat icon={I.users} label="Apprenants" value="54"/>
+        <Stat icon={I.idcard} label="Formateurs" value="4"/>
+        <Stat icon={I.check} label="Satisfaction" value="4,8/5"/>
+      </div>
+
+      {/* Cours en vedette */}
+      <div style={{display:"grid",gridTemplateColumns:mobile?"1fr":"260px 1fr",background:"var(--surface)",border:"1px solid var(--line)",borderRadius:20,overflow:"hidden",boxShadow:"var(--shadow-sm)",marginBottom:18}}>
+        <div style={{position:"relative",minHeight:mobile?150:0}}><Photo seed={feat.seed} h={mobile?150:200} radius={0} kw="course"/>
+          <span style={{position:"absolute",top:10,left:10,background:"rgba(15,23,42,.7)",color:"#fff",fontSize:11,fontWeight:700,padding:"4px 10px",borderRadius:999}}>EN COURS · {feat.prog}%</span></div>
+        <div style={{padding:mobile?16:22,display:"flex",flexDirection:"column",justifyContent:"center"}}>
+          <span style={{fontSize:11.5,fontWeight:700,color:"var(--blue)"}}>REPRENDRE LÀ OÙ VOUS EN ÉTIEZ</span>
+          <h2 style={{fontSize:mobile?18:21,margin:"6px 0 8px"}}>{feat.nom}</h2>
+          <div style={{display:"flex",alignItems:"center",gap:10,flexWrap:"wrap",color:"var(--ink2)",fontSize:12.5}}>
+            <span style={{display:"inline-flex",alignItems:"center",gap:6}}><Avatar name={feat.f} size={24} green/>{feat.f}</span>
+            <span><Star5 n={feat.note}/> {feat.note} ({feat.avis})</span>
+            <span style={{display:"inline-flex",alignItems:"center",gap:4}}><I.book size={13}/>{feat.lecons} leçons</span>
+          </div>
+          <div style={{margin:"14px 0 4px"}}><Progress value={feat.prog}/></div>
+          <div style={{fontSize:11.5,color:"var(--ink3)",marginBottom:14}}>Leçon 16 / {feat.lecons} · « Prophylaxie et biosécurité »</div>
+          <div><Btn small>Continuer le cours <I.arrow size={16}/></Btn></div>
+        </div>
+      </div>
+
+      <div style={{display:"flex",gap:8,overflowX:"auto",paddingBottom:6,marginBottom:14}}>
+        {["Tous les cours","Élevage","Cultures","Gestion","Transformation"].map((c,i)=>(
+          <span key={i} style={{padding:"7px 14px",borderRadius:999,fontSize:12.5,fontWeight:600,whiteSpace:"nowrap",border:"1px solid "+(i===0?"var(--blue)":"var(--line)"),background:i===0?"var(--blue)":"var(--surface)",color:i===0?"#fff":"var(--ink2)"}}>{c}</span>))}
+      </div>
+
+      <div style={{display:"grid",gridTemplateColumns:mobile?"1fr":"repeat(auto-fill,minmax(250px,1fr))",gap:16}}>
+        {courses.map((c,i)=>(
+          <div key={i} className="card-hov hov" style={{background:"var(--surface)",border:"1px solid var(--line)",borderRadius:16,overflow:"hidden",cursor:"pointer",boxShadow:"var(--shadow-sm)"}}>
+            <div style={{position:"relative"}}><Photo seed={c.seed} h={140} radius={0} kw="course"/>
+              <span style={{position:"absolute",top:10,left:10,background:NIV[c.niveau].bg,color:NIV[c.niveau].c,fontSize:10.5,fontWeight:700,padding:"3px 9px",borderRadius:999}}>{c.niveau}</span></div>
+            <div style={{padding:14}}>
+              <span style={{fontSize:11,fontWeight:700,color:"var(--blue)"}}>{c.cat.toUpperCase()}</span>
+              <div style={{fontSize:14.5,fontWeight:700,margin:"5px 0 8px",lineHeight:1.3,minHeight:38}}>{c.nom}</div>
+              <div style={{display:"flex",alignItems:"center",gap:8,fontSize:12,color:"var(--ink2)",marginBottom:10}}>
+                <Avatar name={c.f} size={22} green/><span style={{whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{c.f}</span></div>
+              <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",fontSize:11.5,color:"var(--ink3)"}}>
+                <span><Star5 n={c.note}/> <b style={{color:"var(--ink)"}}>{c.note}</b> ({c.avis})</span>
+                <span style={{display:"inline-flex",alignItems:"center",gap:4}}><I.users size={13}/>{c.eleves}</span>
+              </div>
+              <div style={{borderTop:"1px solid var(--line)",marginTop:11,paddingTop:11}}>
+                {c.prog>0
+                  ? <div><div style={{display:"flex",justifyContent:"space-between",fontSize:11,color:"var(--ink3)",marginBottom:5}}><span>Progression</span><span>{c.prog}%</span></div><Progress value={c.prog}/></div>
+                  : <Btn small ghost full><I.book size={14}/>Commencer le cours</Btn>}
+              </div>
+            </div>
           </div>))}
       </div>
     </div>);
@@ -538,28 +1123,48 @@ const MODULES=[
     {n:"M12",t:"Rapports avancés & BI",ic:"chart",prio:"Basse",actif:false},
     {n:"M13",t:"Formation (École GICETECHA)",ic:"clip",prio:"Basse",actif:false}]},
 ];
-function Modules({mobile}){
+function Modules({mobile,active,onActivate,onDeactivate}){
+  const Tg=({on,onClick,locked})=>(
+    <button onClick={locked?undefined:onClick} title={locked?"Module MVP — toujours actif":(on?"Désactiver":"Activer")} style={{width:42,height:24,borderRadius:999,background:on?"var(--blue)":"var(--neutral-bg)",position:"relative",flexShrink:0,opacity:locked?.55:1,cursor:locked?"default":"pointer",border:"none"}}>
+      <span style={{position:"absolute",top:3,left:on?21:3,width:18,height:18,borderRadius:"50%",background:"#fff",transition:".2s",boxShadow:"0 1px 2px rgba(0,0,0,.3)"}}/></button>);
+  const phase2=["M3","M4","M5","M6"], phase3=["M7","M8","M9","M10","M11","M12","M13"], phase4=EXT_LIST.map(e=>e.code);
+  const p2done=phase2.every(c=>active.includes(c));
+  const p3done=phase3.every(c=>active.includes(c));
+  const p4done=phase4.every(c=>active.includes(c));
+  const next=!p2done?{ph:"Phase 2 — Diversification",desc:"Activez Porcs, Cultures, Stocks et Points de vente.",btn:"Activer la Diversification",codes:phase2,label:"Diversification activée 🌱",grad:"#14532D,#16A34A",tc:"#15803D"}
+            :!p3done?{ph:"Phase 3 — Consolidation",desc:"Activez RH, CRM, Cacao, e-commerce, autres élevages, BI et Formation.",btn:"Activer la Consolidation",codes:phase3,label:"Consolidation activée 🚀",grad:"#1E3A8A,#2563EB",tc:"#1D4ED8"}
+            :!p4done?{ph:"Phase 4 — Extensions",desc:"Activez les extensions : couvoir, fabrication d'aliment, abonnements, traçabilité, logistique, IA…",btn:"Activer les extensions",codes:phase4,label:"Extensions activées ✨",grad:"#5B21B6,#2563EB",tc:"#6D28D9"}:null;
   return (
     <div className="fade">
       <h1 style={{fontSize:26}}>Modules</h1>
-      <p style={{color:"var(--ink3)",margin:"4px 0 16px",fontSize:14}}>13 modules activables progressivement, au rythme de la croissance de l'exploitation.</p>
+      <p style={{color:"var(--ink3)",margin:"4px 0 16px",fontSize:14}}>25 modules — activez ou désactivez chacun via l'interrupteur. Les modules MVP (M1, M2) restent toujours actifs.</p>
       <div style={{display:"flex",gap:12,flexWrap:"wrap",marginBottom:6}}>
-        <Stat icon={I.check} label="Modules actifs" value="2 / 13" tone="var(--green)"/>
-        <Stat icon={I.layers} label="Phase en cours" value="Phase 1" sub="MVP"/>
+        <Stat icon={I.check} label="Modules actifs" value={active.length+" / 25"} tone="var(--green)"/>
+        <Stat icon={I.layers} label="Phase en cours" value={p4done?"Phase 4":p3done?"Phase 3":p2done?"Phase 2":"Phase 1"} sub={p4done?"Extensions":p3done?"Consolidation":p2done?"Diversification":"MVP"}/>
         <Stat icon={I.calendar} label="Vision" value="20 ans"/>
       </div>
+      {next&&(
+        <div style={{display:"flex",alignItems:"center",gap:14,flexWrap:"wrap",background:"linear-gradient(120deg,"+next.grad+")",color:"#fff",borderRadius:18,padding:"16px 18px",marginTop:16,boxShadow:"var(--shadow-sm)"}}>
+          <span style={{width:46,height:46,borderRadius:13,background:"rgba(255,255,255,.18)",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}><I.layers size={24}/></span>
+          <div style={{flex:1,minWidth:180}}><strong style={{fontSize:15,color:"#fff"}}>{next.ph}</strong><div style={{fontSize:12.5,opacity:.92,marginTop:2}}>{next.desc}</div></div>
+          <button onClick={()=>onActivate(next.codes,next.label)} className="press hov" style={{background:"#fff",color:next.tc,fontWeight:700,fontSize:13.5,borderRadius:999,padding:"11px 18px",display:"inline-flex",alignItems:"center",gap:7}}><I.check size={17}/>{next.btn}</button>
+        </div>)}
       {MODULES.map((p,pi)=>(
         <Section key={pi} title={p.ph}>
           <div style={{display:"grid",gridTemplateColumns:mobile?"1fr":"1fr 1fr",gap:12}}>
-            {p.items.map(m=>(
-              <div key={m.n} style={{background:"var(--surface)",border:"1px solid "+(m.actif?"var(--green)":"var(--line)"),borderRadius:16,padding:14,display:"flex",alignItems:"center",gap:12,opacity:m.actif?1:.82,boxShadow:"var(--shadow-sm)"}}>
-                <span style={{width:42,height:42,borderRadius:12,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",background:m.actif?"var(--green-50)":"var(--neutral-bg)",color:m.actif?"var(--green)":"var(--ink3)"}}>{React.createElement(I[m.ic],{size:20})}</span>
+            {p.items.map(m=>{const on=active.includes(m.n);
+              return (
+              <div key={m.n} style={{background:"var(--surface)",border:"1px solid "+(on?"var(--green)":"var(--line)"),borderRadius:16,padding:14,display:"flex",alignItems:"center",gap:12,opacity:on?1:.85,boxShadow:"var(--shadow-sm)"}}>
+                <span style={{width:42,height:42,borderRadius:12,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",background:on?"var(--green-50)":"var(--neutral-bg)",color:on?"var(--green)":"var(--ink3)"}}>{React.createElement(I[m.ic],{size:20})}</span>
                 <div style={{flex:1,minWidth:0}}>
                   <div style={{display:"flex",alignItems:"center",gap:6}}><span style={{fontSize:11,fontWeight:700,color:"var(--ink3)"}}>{m.n}</span><strong style={{fontSize:13.5,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{m.t}</strong></div>
                   <div style={{fontSize:11.5,color:"var(--ink3)",marginTop:2}}>Priorité : {m.prio}</div>
                 </div>
-                {m.actif?<Badge m={{l:"Actif",c:"var(--ok)",bg:"var(--ok-bg)"}}/>:<button className="lift hov" style={{border:"1px solid var(--line)",borderRadius:999,padding:"6px 12px",fontSize:12,fontWeight:600,color:"var(--ink2)",whiteSpace:"nowrap"}}>Activer</button>}
-              </div>))}
+                {(()=>{const core=m.n==="M1"||m.n==="M2"; const canAct=on||pi<=1||(pi===2&&p2done)||(pi===3&&p3done);
+                  if(core) return <div style={{display:"flex",alignItems:"center",gap:7}}><span style={{fontSize:10.5,fontWeight:700,color:"var(--ok)"}}>MVP</span><Tg on locked/></div>;
+                  if(canAct) return <Tg on={on} onClick={()=>on?onDeactivate(m.n):onActivate([m.n])}/>;
+                  return <span style={{fontSize:11.5,color:"var(--ink3)",fontWeight:600,whiteSpace:"nowrap"}}>{pi===3?"Après Phase 3":"Après Phase 2"}</span>;})()}
+              </div>);})}
           </div>
         </Section>))}
     </div>);
@@ -676,6 +1281,596 @@ function Parametres({mobile,role}){
     </div>);
 }
 
+/* ============================ MODALES — FORMULAIRES ============================ */
+const FORMS={
+  bande:{title:"Nouvelle bande",icon:"leaf",tone:"var(--green)",submit:"Créer la bande",fields:[
+    {l:"Code de la bande",v:"B-026"},
+    {l:"Espèce",t:"select",opts:["Poulets de chair","Pondeuses","Pintades","Canards"]},
+    {l:"Date de début",t:"date",v:"24/06/2026",half:true},
+    {l:"Durée du cycle",t:"number",v:"42",suf:"j",half:true},
+    {l:"Effectif initial",t:"number",v:"250",suf:"sujets"},
+    {l:"Coût des poussins",t:"number",v:"125000",suf:"FCFA"}]},
+  mortalite:{title:"Enregistrer une mortalité",icon:"alert",tone:"var(--danger)",submit:"Enregistrer",fields:[
+    {l:"Bande",t:"select",opts:["B-024 · Poulets de chair","B-025 · Pondeuses"]},
+    {l:"Date",t:"date",v:"24/06/2026",half:true},
+    {l:"Nombre de sujets",t:"number",v:"3",half:true},
+    {l:"Cause probable",t:"select",opts:["Forte chaleur","Maladie","Écrasement","Inconnue"]}]},
+  alimentation:{title:"Distribution d'aliment",icon:"leaf",tone:"var(--green)",submit:"Enregistrer",fields:[
+    {l:"Bande",t:"select",opts:["B-024 · Poulets de chair","B-025 · Pondeuses"]},
+    {l:"Date",t:"date",v:"24/06/2026",half:true},
+    {l:"Quantité",t:"number",v:"25",suf:"kg",half:true},
+    {l:"Type d'aliment",t:"select",opts:["Démarrage","Croissance","Finition","Ponte"]}]},
+  vaccination:{title:"Vaccination / traitement",icon:"syringe",tone:"var(--blue)",submit:"Enregistrer",fields:[
+    {l:"Bande",t:"select",opts:["B-024 · Poulets de chair","B-025 · Pondeuses"]},
+    {l:"Date",t:"date",v:"24/06/2026",half:true},
+    {l:"Produit / vaccin",t:"select",opts:["Newcastle","Gumboro","Vitamines","Antibiotique"],half:true},
+    {l:"Coût",t:"number",v:"22000",suf:"FCFA"}]},
+  vente:{title:"Nouvelle vente",icon:"coins",tone:"var(--green)",submit:"Enregistrer la vente",fields:[
+    {l:"Client",v:"Restaurant Le Manguier"},
+    {l:"Article",t:"select",opts:["Poulet vif (kg)","Poulet rôti","Œufs (plateau)","Plantain (régime)"]},
+    {l:"Quantité",t:"number",v:"30",half:true},
+    {l:"Prix unitaire",t:"number",v:"3500",suf:"FCFA",half:true},
+    {l:"Bande d'origine",t:"select",opts:["—","B-024","B-023"],half:true},
+    {l:"Date",t:"date",v:"24/06/2026",half:true}]},
+  mouvement:{title:"Nouveau mouvement de trésorerie",icon:"coins",tone:"var(--blue)",submit:"Enregistrer",fields:[
+    {l:"Type",t:"select",opts:["Entrée (recette)","Sortie (dépense)"]},
+    {l:"Montant",t:"number",v:"50000",suf:"FCFA",half:true},
+    {l:"Date",t:"date",v:"24/06/2026",half:true},
+    {l:"Catégorie",t:"select",opts:["Ventes","Aliments","Cheptel","Santé","Salaires","Autre"]},
+    {l:"Libellé",v:"Achat d'aliment croissance"}]},
+  porcs:{title:"Nouvelle portée (porcs)",icon:"pig",tone:"var(--blue)",submit:"Enregistrer",fields:[
+    {l:"Truie",t:"select",opts:["Truie #T-01","Truie #T-02","Nouvelle truie"]},
+    {l:"Date de mise bas",t:"date",v:"24/06/2026",half:true},
+    {l:"Porcelets nés",t:"number",v:"10",half:true},
+    {l:"Porcelets vivants",t:"number",v:"9",half:true},
+    {l:"Poids moyen",t:"number",v:"1.4",suf:"kg",half:true}]},
+  culture:{title:"Nouvelle culture",icon:"wheat",tone:"var(--green)",submit:"Enregistrer",fields:[
+    {l:"Culture",t:"select",opts:["Maïs","Manioc","Plantain","Arachide"]},
+    {l:"Parcelle",t:"select",opts:["Parcelle A","Parcelle B","Nouvelle parcelle"],half:true},
+    {l:"Surface",t:"number",v:"0.5",suf:"ha",half:true},
+    {l:"Date de semis",t:"date",v:"24/06/2026",half:true},
+    {l:"Récolte prévue",t:"date",v:"15/10/2026",half:true}]},
+  employe:{title:"Ajouter un employé",icon:"idcard",tone:"var(--blue)",submit:"Enregistrer",fields:[
+    {l:"Nom complet",v:"Paul Eto'o"},
+    {l:"Poste",t:"select",opts:["Ouvrier élevage","Vendeur","Ouvrier agricole","Gardien"]},
+    {l:"Type de contrat",t:"select",opts:["CDI","CDD","Saisonnier"],half:true},
+    {l:"Salaire mensuel",t:"number",v:"60000",suf:"FCFA",half:true}]},
+  session:{title:"Nouvelle session de formation",icon:"book",tone:"var(--green)",submit:"Créer la session",fields:[
+    {l:"Intitulé",v:"Aviculture moderne"},
+    {l:"Formateur",t:"select",opts:["Gildas","Cécilia","Intervenant externe"]},
+    {l:"Date de début",t:"date",v:"01/07/2026",half:true},
+    {l:"Places",t:"number",v:"20",half:true}]},
+};
+
+const MInput=({f})=>{
+  const box={display:"flex",alignItems:"center",gap:8,background:"var(--bg)",border:"1px solid var(--line)",borderRadius:11,padding:"11px 12px"};
+  return (
+    <label style={{display:"flex",flexDirection:"column",gap:6,gridColumn:f.half?"auto":"1 / -1"}}>
+      <span style={{fontSize:12.5,fontWeight:600,color:"var(--ink2)"}}>{f.l}</span>
+      {f.t==="select"
+        ? <div className="lift hov" style={{...box,justifyContent:"space-between",cursor:"pointer"}}><span style={{fontSize:14,color:"var(--ink)"}}>{f.opts[0]}</span><I.chev size={16} style={{color:"var(--ink3)",transform:"rotate(90deg)"}}/></div>
+        : <div style={box}><input defaultValue={f.v} style={{flex:1,minWidth:0,border:"none",outline:"none",background:"transparent",fontSize:14,color:"var(--ink)",fontFamily:"Inter"}}/>{f.suf&&<span style={{fontSize:12.5,color:"var(--ink3)",fontWeight:600}}>{f.suf}</span>}</div>}
+    </label>);
+};
+
+function Modal({icon,tone="var(--blue)",title,sub,close,mobile,children,footer,wide}){
+  return (
+    <div style={{position:"fixed",inset:0,zIndex:100,display:"flex",alignItems:"center",justifyContent:"center",padding:16}}>
+      <div onClick={close} style={{position:"absolute",inset:0,background:"rgba(15,23,42,.55)",backdropFilter:"blur(2px)"}}/>
+      <div className="pop" style={{position:"relative",background:"var(--surface)",borderRadius:20,width:mobile?"100%":(wide?520:460),maxWidth:"100%",maxHeight:"92vh",display:"flex",flexDirection:"column",boxShadow:"var(--shadow)"}}>
+        <div style={{display:"flex",alignItems:"center",gap:12,padding:"15px 18px",borderBottom:"1px solid var(--line)"}}>
+          {icon&&<span style={{width:38,height:38,borderRadius:11,background:"var(--blue-50)",color:tone,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>{React.createElement(icon,{size:20})}</span>}
+          <div style={{flex:1,minWidth:0}}><h3 style={{fontSize:16}}>{title}</h3>{sub&&<div style={{fontSize:12,color:"var(--ink3)"}}>{sub}</div>}</div>
+          <button onClick={close} className="hov" style={{color:"var(--ink3)"}}><I.x size={20}/></button>
+        </div>
+        <div style={{padding:18,overflow:"auto"}}>{children}</div>
+        {footer&&<div style={{padding:"14px 18px",borderTop:"1px solid var(--line)"}}>{footer}</div>}
+      </div>
+    </div>);
+}
+
+function FormModal({id,mobile,close,onSaved}){
+  const f=FORMS[id]; if(!f) return null;
+  return (
+    <Modal mobile={mobile} icon={I[f.icon]} tone={f.tone} title={f.title} close={close}
+      footer={<div style={{display:"flex",gap:10}}><Btn ghost full onClick={close}>Annuler</Btn><Btn full onClick={()=>onSaved("Enregistré ✓")}><I.check size={17}/>{f.submit}</Btn></div>}>
+      <div style={{display:"grid",gridTemplateColumns:mobile?"1fr":"1fr 1fr",gap:14}}>
+        {f.fields.map((fl,i)=><MInput key={i} f={fl}/>)}
+      </div>
+      <div style={{marginTop:14,display:"flex",alignItems:"center",gap:8,fontSize:12,color:"var(--blue-700)",background:"var(--blue-50)",border:"1px solid var(--blue-100)",borderRadius:10,padding:"9px 12px"}}>
+        <I.wifi size={15}/><span>Enregistré localement — synchronisé à la reconnexion (mode hors-ligne).</span></div>
+    </Modal>);
+}
+
+/* ============================ MODALE — PAIEMENT MOBILE MONEY ============================ */
+function PaymentModal({mobile,close}){
+  const [step,setStep]=useState("choose");
+  const [op,setOp]=useState("orange");
+  const ops={orange:{n:"Orange Money",c:"#FF6F00",tc:"#fff",ab:"OM"},mtn:{n:"MTN MoMo",c:"#FFCB05",tc:"#1E293B",ab:"MTN"}};
+  const total=20600;
+  const OpBtn=({k})=>{const o=ops[k];const act=op===k;
+    return <button onClick={()=>setOp(k)} className="hov" style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:8,padding:"16px 10px",borderRadius:14,border:"2px solid "+(act?o.c:"var(--line)"),background:act?o.c+"14":"var(--surface)"}}>
+      <span style={{width:48,height:48,borderRadius:12,background:o.c,color:o.tc,fontWeight:800,fontFamily:"'Outfit',sans-serif",fontSize:14,display:"flex",alignItems:"center",justifyContent:"center"}}>{o.ab}</span>
+      <span style={{fontSize:13,fontWeight:700}}>{o.n}</span></button>;};
+  let body,footer;
+  if(step==="choose"){
+    body=<>
+      <div style={{textAlign:"center",marginBottom:16}}><div style={{fontSize:12.5,color:"var(--ink3)"}}>Montant à payer</div><div style={{fontSize:30,fontWeight:800,fontFamily:"'Outfit',sans-serif"}}>{fcfa(total)}</div></div>
+      <div style={{fontSize:12.5,fontWeight:600,color:"var(--ink2)",marginBottom:9}}>Choisissez votre opérateur</div>
+      <div style={{display:"flex",gap:12}}><OpBtn k="orange"/><OpBtn k="mtn"/></div>
+    </>;
+    footer=<Btn full onClick={()=>setStep("confirm")}>Continuer <I.arrow size={17}/></Btn>;
+  } else if(step==="confirm"){
+    const o=ops[op];
+    body=<>
+      <div style={{display:"flex",alignItems:"center",gap:10,background:"var(--bg)",border:"1px solid var(--line)",borderRadius:12,padding:"10px 12px",marginBottom:16}}>
+        <span style={{width:38,height:38,borderRadius:10,background:o.c,color:o.tc,fontWeight:800,fontSize:12,display:"flex",alignItems:"center",justifyContent:"center"}}>{o.ab}</span>
+        <div style={{flex:1}}><div style={{fontSize:13.5,fontWeight:700}}>{o.n}</div><div style={{fontSize:11.5,color:"var(--ink3)"}}>Paiement mobile sécurisé</div></div>
+        <button onClick={()=>setStep("choose")} className="hov" style={{color:"var(--blue)",fontSize:12,fontWeight:600}}>Changer</button></div>
+      <label style={{display:"flex",flexDirection:"column",gap:6,marginBottom:14}}>
+        <span style={{fontSize:12.5,fontWeight:600,color:"var(--ink2)"}}>Numéro de téléphone</span>
+        <div style={{display:"flex",alignItems:"center",gap:8,background:"var(--bg)",border:"1px solid var(--line)",borderRadius:11,padding:"11px 12px"}}>
+          <span style={{fontSize:14,color:"var(--ink3)",fontWeight:600}}>+237</span>
+          <input defaultValue="6 91 23 45 67" style={{flex:1,minWidth:0,border:"none",outline:"none",background:"transparent",fontSize:14,color:"var(--ink)",fontFamily:"Inter"}}/></div>
+      </label>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",background:"var(--bg)",borderRadius:12,padding:"12px 14px"}}>
+        <span style={{color:"var(--ink2)",fontSize:13}}>Total à payer</span><b style={{fontSize:17,fontFamily:"'Outfit',sans-serif"}}>{fcfa(total)}</b></div>
+      <div style={{marginTop:12,fontSize:11.5,color:"var(--ink3)",display:"flex",gap:6,alignItems:"flex-start"}}><I.shield size={14} style={{marginTop:1,flexShrink:0}}/><span>Vous recevrez une demande de confirmation sur votre téléphone (#150# ou *126#).</span></div>
+    </>;
+    footer=<Btn full onClick={()=>setStep("success")}><I.coins size={17}/>Payer {fcfa(total)}</Btn>;
+  } else {
+    body=<div style={{textAlign:"center",padding:"14px 0"}}>
+      <div className="pop" style={{width:74,height:74,borderRadius:"50%",background:"var(--ok-bg)",color:"var(--ok)",display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 16px"}}><I.check size={40} sw={2.4}/></div>
+      <h2 style={{fontSize:21}}>Paiement réussi !</h2>
+      <p style={{color:"var(--ink2)",fontSize:13.5,marginTop:8,lineHeight:1.5}}>Votre commande <b>#CMD-1043</b> est confirmée.<br/>Vous serez livré sous 24–48h à Yaoundé.</p>
+      <div style={{display:"inline-flex",alignItems:"center",gap:6,marginTop:14,fontSize:12,color:"var(--ink3)"}}><I.receipt size={14}/>Reçu envoyé par SMS</div>
+    </div>;
+    footer=<Btn full onClick={close}>Terminer</Btn>;
+  }
+  return <Modal mobile={mobile} icon={step==="success"?null:I.cart} title={step==="success"?"Confirmation":"Paiement Mobile Money"} sub={step==="success"?null:"Orange Money · MTN MoMo"} close={close} footer={footer}>{body}</Modal>;
+}
+
+/* ============================ COURBE (LineChart) ============================ */
+function LineChart({data,height=120,color="var(--blue)"}){
+  const max=Math.max(...data.map(d=>d.v),1),n=data.length;
+  const X=i=>(i/(n-1))*100, Y=v=>(1-v/max)*88+6;
+  const line=data.map((d,i)=>`${X(i)},${Y(d.v)}`).join(" ");
+  const area=`0,100 ${line} 100,100`;
+  return (
+    <div>
+      <div style={{position:"relative",height}}>
+        <svg viewBox="0 0 100 100" preserveAspectRatio="none" style={{position:"absolute",inset:0,width:"100%",height:"100%"}}>
+          <defs><linearGradient id="lcg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor={color} stopOpacity="0.22"/><stop offset="1" stopColor={color} stopOpacity="0"/></linearGradient></defs>
+          <polygon points={area} fill="url(#lcg)"/>
+          <polyline points={line} fill="none" stroke={color} strokeWidth="2" vectorEffect="non-scaling-stroke" strokeLinejoin="round" strokeLinecap="round"/>
+        </svg>
+        {data.map((d,i)=><div key={i} style={{position:"absolute",left:X(i)+"%",top:Y(d.v)+"%",transform:"translate(-50%,-50%)",width:9,height:9,borderRadius:"50%",background:"var(--surface)",border:"2px solid "+color}}/>)}
+      </div>
+      <div style={{display:"flex",justifyContent:"space-between",marginTop:6}}>
+        {data.map((d,i)=><span key={i} style={{fontSize:10.5,color:"var(--ink3)",fontWeight:600}}>{d.l}</span>)}
+      </div>
+    </div>);
+}
+
+/* ============================ PHASE 4 — EXTENSIONS ============================ */
+const EXT_LIST=[
+  {code:"M14",icon:"egg",label:"Couvoir",key:"Couvoir",title:"Couvoir & Incubation",desc:"Produire vos propres poussins — intégration verticale de la filière volaille.",
+    kpis:[["Œufs en incubation","320"],["Éclosions (mois)","285"],["Taux d'éclosion","89%"]],
+    feats:["Lots d'incubation et suivi des éclosions","Planning des mises en incubation","Création automatique d'une bande à l'éclosion"]},
+  {code:"M15",icon:"wheat",label:"Aliment",key:"Aliment",title:"Fabrication d'aliment",desc:"Réduire le 1er poste de coût de l'élevage en produisant votre aliment.",
+    kpis:[["Coût / kg","285 FCFA"],["FCR moyen","1,8"],["Formules","4"]],
+    feats:["Formules par espèce et par âge","Calcul du coût de revient au kg","Indice de consommation (FCR) par bande","Suivi des matières premières"]},
+  {code:"M16",icon:"syringe",label:"Santé",key:"Sante",title:"Santé animale & Biosécurité",desc:"Réduire la mortalité et sécuriser le cheptel.",
+    kpis:[["Vaccinations à jour","100%"],["Rappels à venir","2"],["Incidents (mois)","1"]],
+    feats:["Calendrier de prophylaxie","Registre sanitaire par bande","Protocoles de biosécurité","Alertes de rappel automatiques"]},
+  {code:"M17",icon:"drop",label:"Agro-météo",key:"Meteo",title:"Agro-météo & Calendrier cultural",desc:"Décider au bon moment pour les cultures.",
+    kpis:[["Pluie prévue (7j)","42 mm"],["Tâches agricoles","5"],["Alertes","1"]],
+    feats:["Prévisions météo locales","Calendrier semis / traitement / récolte","Alertes d'irrigation","Journal des interventions"]},
+  {code:"M18",icon:"shield",label:"Traçabilité",key:"Tracabilite",title:"Traçabilité & Qualité",desc:"Vendre plus cher aux professionnels grâce à la confiance.",
+    kpis:[["Lots tracés","128"],["Certifications","2"],["QR générés","340"]],
+    feats:["Traçabilité par lot, de la ferme à l'assiette","Fiches qualité produit","Gestion des certifications","Étiquettes / QR code"]},
+  {code:"M19",icon:"box",label:"Logistique",key:"Logistique",title:"Logistique & Livraisons",desc:"Soutenir la montée en charge du e-commerce.",
+    kpis:[["Livraisons (jour)","14"],["Chauffeurs","2"],["Zones","6"]],
+    feats:["Tournées de livraison","Affectation des chauffeurs","Zones et frais de livraison","Preuve de livraison"]},
+  {code:"M20",icon:"receipt",label:"Abonnements",key:"Abonnements",title:"Abonnements & Paniers récurrents",desc:"Générer un revenu récurrent et prévisible.",
+    kpis:[["Abonnés actifs","58"],["Revenu récurrent","870 000 FCFA"],["Rétention","92%"]],
+    feats:["Formules (œufs / poulet hebdomadaires)","Renouvellement automatique","Paiements récurrents Mobile Money","Gestion des pauses et annulations"]},
+  {code:"M21",icon:"idcard",label:"Paie",key:"Paie",title:"Paie & Conformité sociale",desc:"Gérer le personnel dans les règles (CNPS, OHADA).",
+    kpis:[["Bulletins (mois)","6"],["Masse salariale","200 000 FCFA"],["Congés","1"]],
+    feats:["Bulletins de paie","Cotisations CNPS","Congés et absences","Conformité OHADA"]},
+  {code:"M22",icon:"wallet",label:"Financement",key:"Financement",title:"Financement & Investisseurs",desc:"Financer la croissance de l'exploitation.",
+    kpis:[["Crédits en cours","1,5 M FCFA"],["Subventions","1"],["Échéance proche","15 j"]],
+    feats:["Suivi des crédits et échéances","Dossiers de subvention agricole","Reporting investisseurs","Plan de financement"]},
+  {code:"M23",icon:"pie",label:"Aide IA",key:"IA",title:"Aide à la décision & IA",desc:"Anticiper plutôt que constater.",
+    kpis:[["Mortalité prédite","4,2%"],["Prix conseillé","3 600/kg"],["Anomalies","2"]],
+    feats:["Prédiction de la mortalité","Suggestion de prix de vente selon le marché","Optimisation des cycles d'élevage","Détection d'anomalies"]},
+  {code:"M24",icon:"leaf",label:"Circulaire",key:"Circulaire",title:"Économie circulaire",desc:"Valoriser les déchets et réduire les coûts d'intrants.",
+    kpis:[["Compost produit","1,2 t"],["Énergie solaire","65%"],["Coûts évités","18%"]],
+    feats:["Fumier → compost / biogaz","Suivi de l'énergie (solaire)","Réduction des coûts d'intrants","Bilan environnemental"]},
+  {code:"M25",icon:"layers",label:"Multi-sites",key:"Multisites",title:"Multi-sites & Coopérative",desc:"Passer à l'échelle et fédérer d'autres producteurs.",
+    kpis:[["Sites","2"],["Membres coop.","8"],["Contrats","4"]],
+    feats:["Gestion multi-fermes","Membres de coopérative et parts","Contrats d'intégration (éleveurs sous contrat)","Consolidation multi-sites"]},
+];
+const EXT={}; EXT_LIST.forEach(e=>{EXT[e.key]=e;});
+MODULES.push({ph:"Phase 4 — Extensions & approfondissements (opportunités)",items:EXT_LIST.map(e=>({n:e.code,t:e.title,ic:e.icon,prio:"Extension"}))});
+
+function ModuleScreen({cfg,mobile}){
+  return (
+    <div className="fade">
+      <span style={{background:"var(--ok-bg)",color:"var(--ok)",fontSize:11,fontWeight:700,padding:"3px 10px",borderRadius:999,display:"inline-flex",alignItems:"center",gap:5}}><I.check size={13}/>Module activé · Phase 4</span>
+      <h1 style={{fontSize:26,marginTop:8}}>{cfg.title}</h1>
+      <p style={{color:"var(--ink3)",margin:"4px 0 16px",fontSize:14}}>{cfg.desc}</p>
+      <div style={{display:"grid",gridTemplateColumns:mobile?"1fr 1fr":"repeat("+cfg.kpis.length+",1fr)",gap:12,marginBottom:16}}>
+        {cfg.kpis.map(([l,v],i)=><Stat key={i} icon={I[cfg.icon]} label={l} value={v}/>)}
+      </div>
+      <div style={{background:"var(--surface)",border:"1px solid var(--line)",borderRadius:18,padding:18,boxShadow:"var(--shadow-sm)"}}>
+        <strong>Fonctionnalités prévues</strong>
+        <div style={{marginTop:12,display:"flex",flexDirection:"column",gap:10}}>
+          {cfg.feats.map((f,i)=>(
+            <div key={i} style={{display:"flex",alignItems:"center",gap:11}}>
+              <span style={{width:30,height:30,borderRadius:9,background:"var(--blue-50)",color:"var(--blue)",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}><I.check size={16}/></span>
+              <span style={{fontSize:13.5,color:"var(--ink2)"}}>{f}</span>
+            </div>))}
+        </div>
+      </div>
+    </div>);
+}
+
+/* ============================ ÉCRANS PHASE 4 (détaillés) ============================ */
+const P4Head=({title,desc,action})=>(
+  <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:10}}>
+    <div><div style={{display:"flex",alignItems:"center",gap:8}}><span style={{background:"var(--ok-bg)",color:"var(--ok)",fontSize:10.5,fontWeight:700,padding:"2px 9px",borderRadius:999}}>PHASE 4</span></div>
+      <h1 style={{fontSize:26,marginTop:6}}>{title}</h1><p style={{color:"var(--ink3)",margin:"4px 0 0",fontSize:14}}>{desc}</p></div>
+    {action}
+  </div>);
+
+function ScrCouvoir({mobile}){
+  const lots=[{id:"INC-08",oeufs:240,jour:18,statut:"Mirage validé",c:"var(--info)",bg:"var(--info-bg)",eclos:"dans 3 j"},
+    {id:"INC-07",oeufs:200,jour:21,statut:"Éclosion en cours",c:"var(--green)",bg:"var(--green-50)",eclos:"aujourd'hui"},
+    {id:"INC-06",oeufs:180,jour:7,statut:"Incubation",c:"var(--amber)",bg:"var(--warn-bg)",eclos:"dans 14 j"}];
+  return (<div className="fade">
+    <P4Head title="Couvoir & Incubation" desc="Produisez vos propres poussins — incubation et éclosions." action={<Btn small><I.plus size={15}/>Nouvelle incubation</Btn>}/>
+    <div style={{display:"grid",gridTemplateColumns:mobile?"1fr 1fr":"repeat(4,1fr)",gap:12,margin:"18px 0"}}>
+      <Stat icon={I.egg} label="Œufs en incubation" value="620"/>
+      <Stat icon={I.check} label="Éclosions (mois)" value="285" tone="var(--green)"/>
+      <Stat icon={I.trend} label="Taux d'éclosion" value="89%"/>
+      <Stat icon={I.clock} label="Prochaine éclosion" value="Auj."/>
+    </div>
+    <div style={{background:"var(--surface)",border:"1px solid var(--line)",borderRadius:18,overflow:"hidden",boxShadow:"var(--shadow-sm)"}}>
+      <div style={{padding:"14px 16px",borderBottom:"1px solid var(--line)"}}><strong>Lots en incubation</strong></div>
+      {lots.map((l,i)=>(
+        <div key={i} style={{display:"flex",alignItems:"center",gap:13,padding:"13px 16px",borderBottom:i<lots.length-1?"1px solid var(--line)":"none"}}>
+          <div style={{width:42,height:42,borderRadius:11,background:"var(--blue-50)",color:"var(--blue)",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}><I.egg size={20}/></div>
+          <div style={{flex:1,minWidth:0}}>
+            <div style={{display:"flex",gap:8,alignItems:"center",flexWrap:"wrap"}}><strong style={{fontSize:14}}>{l.id}</strong><span style={{fontSize:12,color:"var(--ink3)"}}>{l.oeufs} œufs</span></div>
+            <div style={{display:"flex",alignItems:"center",gap:8,marginTop:6}}><div style={{flex:1,maxWidth:200}}><Progress value={Math.round(l.jour/21*100)}/></div><span style={{fontSize:11,color:"var(--ink3)"}}>J{l.jour}/21</span></div>
+          </div>
+          <div style={{textAlign:"right"}}><span style={{background:l.bg,color:l.c,fontSize:11,fontWeight:700,padding:"4px 10px",borderRadius:999,whiteSpace:"nowrap"}}>{l.statut}</span>
+            <div style={{fontSize:11,color:"var(--ink3)",marginTop:4}}>Éclosion {l.eclos}</div></div>
+        </div>))}
+    </div>
+  </div>);
+}
+
+function ScrAliment({mobile}){
+  const F=[{nom:"Démarrage",cout:310,fcr:"1,6",comp:[["Maïs",55,"var(--amber)"],["Tourteau soja",30,"var(--green)"],["Concentré",10,"var(--blue)"],["Prémix",5,"var(--neutral)"]]},
+    {nom:"Croissance",cout:285,fcr:"1,8",comp:[["Maïs",60,"var(--amber)"],["Tourteau soja",25,"var(--green)"],["Son de blé",10,"var(--blue)"],["Prémix",5,"var(--neutral)"]]},
+    {nom:"Finition",cout:270,fcr:"2,0",comp:[["Maïs",64,"var(--amber)"],["Tourteau soja",22,"var(--green)"],["Son",9,"var(--blue)"],["Prémix",5,"var(--neutral)"]]}];
+  return (<div className="fade">
+    <P4Head title="Fabrication d'aliment" desc="Produisez votre aliment et maîtrisez votre 1er poste de coût." action={<Btn small><I.plus size={15}/>Nouvelle formule</Btn>}/>
+    <div style={{display:"grid",gridTemplateColumns:mobile?"1fr 1fr":"repeat(4,1fr)",gap:12,margin:"18px 0"}}>
+      <Stat icon={I.coins} label="Coût moyen / kg" value="285 FCFA" tone="var(--green)"/>
+      <Stat icon={I.trend} label="FCR moyen" value="1,8"/>
+      <Stat icon={I.wheat} label="Formules" value="3"/>
+      <Stat icon={I.down} label="Économie vs marché" value="22%" tone="var(--green)"/>
+    </div>
+    <div style={{display:"grid",gridTemplateColumns:mobile?"1fr":"repeat(3,1fr)",gap:14}}>
+      {F.map((f,i)=>(
+        <div key={i} style={{background:"var(--surface)",border:"1px solid var(--line)",borderRadius:18,padding:16,boxShadow:"var(--shadow-sm)"}}>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}><strong style={{fontSize:15}}>{f.nom}</strong><span style={{fontSize:11.5,color:"var(--ink3)"}}>FCR {f.fcr}</span></div>
+          <div style={{fontSize:22,fontWeight:800,fontFamily:"'Outfit',sans-serif",margin:"6px 0 12px"}}>{f.cout}<span style={{fontSize:12,color:"var(--ink3)",fontWeight:500}}> FCFA/kg</span></div>
+          <div style={{display:"flex",height:9,borderRadius:999,overflow:"hidden",marginBottom:10}}>{f.comp.map((c,j)=><div key={j} style={{width:c[1]+"%",background:c[2]}}/>)}</div>
+          {f.comp.map((c,j)=>(<div key={j} style={{display:"flex",alignItems:"center",gap:7,fontSize:12,color:"var(--ink2)",padding:"3px 0"}}>
+            <span style={{width:9,height:9,borderRadius:3,background:c[2]}}/><span style={{flex:1}}>{c[0]}</span><b>{c[1]}%</b></div>))}
+        </div>))}
+    </div>
+  </div>);
+}
+
+function ScrSante({mobile}){
+  const plan=[{t:"Vaccination Newcastle (HB1)",b:"B-025",st:"Fait",c:"var(--ok)",bg:"var(--ok-bg)",d:"J7 · 17 juin"},
+    {t:"Vaccination Gumboro",b:"B-024",st:"À venir",c:"var(--amber)",bg:"var(--warn-bg)",d:"J14 · 26 juin"},
+    {t:"Rappel Newcastle (Lasota)",b:"B-024",st:"À venir",c:"var(--amber)",bg:"var(--warn-bg)",d:"J21 · 03 juil."}];
+  const bio=[["Pédiluve désinfectant",true],["Vide sanitaire respecté",true],["Accès visiteurs contrôlé",true],["Dératisation à refaire",false]];
+  return (<div className="fade">
+    <P4Head title="Santé animale & Biosécurité" desc="Réduisez la mortalité et sécurisez le cheptel." action={<Btn small><I.plus size={15}/>Programmer un acte</Btn>}/>
+    <div style={{display:"grid",gridTemplateColumns:mobile?"1fr 1fr":"repeat(4,1fr)",gap:12,margin:"18px 0"}}>
+      <Stat icon={I.check} label="Vaccinations à jour" value="100%" tone="var(--green)"/>
+      <Stat icon={I.calendar} label="Rappels à venir" value="2"/>
+      <Stat icon={I.alert} label="Incidents (mois)" value="1" tone="var(--amber)"/>
+      <Stat icon={I.shield} label="Biosécurité" value="92%"/>
+    </div>
+    <div style={{display:"grid",gridTemplateColumns:mobile?"1fr":"1.5fr 1fr",gap:16}}>
+      <div style={{background:"var(--surface)",border:"1px solid var(--line)",borderRadius:18,padding:18,boxShadow:"var(--shadow-sm)"}}>
+        <strong>Calendrier de prophylaxie</strong>
+        <div style={{marginTop:12}}>{plan.map((p,i)=>(
+          <div key={i} style={{display:"flex",alignItems:"center",gap:12,padding:"11px 0",borderBottom:i<plan.length-1?"1px solid var(--line)":"none"}}>
+            <span style={{width:34,height:34,borderRadius:10,background:"var(--blue-50)",color:"var(--blue)",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}><I.syringe size={16}/></span>
+            <div style={{flex:1,minWidth:0}}><div style={{fontSize:13.5,fontWeight:600}}>{p.t}</div><div style={{fontSize:11.5,color:"var(--ink3)"}}>{p.b} · {p.d}</div></div>
+            <span style={{background:p.bg,color:p.c,fontSize:11,fontWeight:700,padding:"4px 10px",borderRadius:999,whiteSpace:"nowrap"}}>{p.st}</span></div>))}</div>
+      </div>
+      <div style={{background:"var(--surface)",border:"1px solid var(--line)",borderRadius:18,padding:18,boxShadow:"var(--shadow-sm)"}}>
+        <strong>Check biosécurité</strong>
+        <div style={{marginTop:12,display:"flex",flexDirection:"column",gap:11}}>{bio.map((b,i)=>(
+          <div key={i} style={{display:"flex",alignItems:"center",gap:10,fontSize:13,color:"var(--ink2)"}}>
+            <span style={{width:24,height:24,borderRadius:7,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",background:b[1]?"var(--ok-bg)":"var(--warn-bg)",color:b[1]?"var(--ok)":"var(--amber)"}}>{b[1]?<I.check size={14}/>:<I.alert size={14}/>}</span>
+            {b[0]}</div>))}</div>
+      </div>
+    </div>
+  </div>);
+}
+
+function ScrMeteo({mobile}){
+  const days=[["Auj.",28,15],["Jeu",27,40],["Ven",26,60],["Sam",29,10],["Dim",30,5],["Lun",28,20],["Mar",27,35]];
+  const tasks=[{t:"Irrigation parcelle A (maïs)",w:"Demain matin",a:false},{t:"Traitement préventif mildiou",w:"Avant la pluie (Ven)",a:true},{t:"Semis 2e cycle haricot",w:"Sam · sol ressuyé",a:false}];
+  return (<div className="fade">
+    <P4Head title="Agro-météo & Calendrier cultural" desc="Décidez au bon moment selon la météo locale (Yaoundé)." action={null}/>
+    <div style={{display:"grid",gridTemplateColumns:mobile?"1fr 1fr":"repeat(4,1fr)",gap:12,margin:"18px 0"}}>
+      <Stat icon={I.drop} label="Pluie prévue (7j)" value="42 mm" tone="var(--blue)"/>
+      <Stat icon={I.trend} label="Température" value="28°C"/>
+      <Stat icon={I.clip} label="Tâches agricoles" value="5"/>
+      <Stat icon={I.alert} label="Alertes" value="1" tone="var(--amber)"/>
+    </div>
+    <div style={{background:"var(--surface)",border:"1px solid var(--line)",borderRadius:18,padding:16,boxShadow:"var(--shadow-sm)",marginBottom:16}}>
+      <strong>Prévisions · 7 jours</strong>
+      <div style={{display:"grid",gridTemplateColumns:"repeat(7,1fr)",gap:8,marginTop:14}}>
+        {days.map((d,i)=>(<div key={i} style={{textAlign:"center",background:i===0?"var(--blue-50)":"transparent",borderRadius:12,padding:"10px 4px"}}>
+          <div style={{fontSize:11,color:"var(--ink3)",fontWeight:600}}>{d[0]}</div>
+          <div style={{color:d[2]>40?"var(--blue)":"var(--amber)",margin:"6px 0"}}><I.drop size={18}/></div>
+          <div style={{fontSize:13,fontWeight:700}}>{d[1]}°</div>
+          <div style={{fontSize:10.5,color:"var(--blue)"}}>{d[2]}%</div></div>))}
+      </div>
+    </div>
+    <div style={{background:"var(--surface)",border:"1px solid var(--line)",borderRadius:18,padding:18,boxShadow:"var(--shadow-sm)"}}>
+      <strong>Tâches recommandées</strong>
+      <div style={{marginTop:12}}>{tasks.map((t,i)=>(
+        <div key={i} style={{display:"flex",alignItems:"center",gap:12,padding:"11px 0",borderBottom:i<tasks.length-1?"1px solid var(--line)":"none"}}>
+          <span style={{width:32,height:32,borderRadius:9,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",background:t.a?"var(--warn-bg)":"var(--green-50)",color:t.a?"var(--amber)":"var(--green)"}}>{t.a?<I.alert size={16}/>:<I.leaf size={16}/>}</span>
+          <div style={{flex:1,minWidth:0}}><div style={{fontSize:13.5,fontWeight:600}}>{t.t}</div><div style={{fontSize:11.5,color:"var(--ink3)"}}>{t.w}</div></div>
+          {t.a&&<span style={{background:"var(--warn-bg)",color:"var(--amber)",fontSize:10.5,fontWeight:700,padding:"3px 9px",borderRadius:999}}>URGENT</span>}</div>))}</div>
+    </div>
+  </div>);
+}
+
+function ScrTracabilite({mobile}){
+  const journey=["Éclosion","Élevage","Abattage","Conditionnement","Vente"];
+  const cur=4;
+  const lots=[{id:"LOT-2406-A",p:"Poulet de chair",b:"B-023",q:"52 sujets",st:"Vendu",c:"var(--ok)",bg:"var(--ok-bg)"},
+    {id:"LOT-2406-B",p:"Œufs frais",b:"Pondeuses",q:"8 plateaux",st:"En vente",c:"var(--info)",bg:"var(--info-bg)"},
+    {id:"LOT-2405-C",p:"Plantain",b:"Parcelle C",q:"15 régimes",st:"Livré",c:"var(--ok)",bg:"var(--ok-bg)"}];
+  return (<div className="fade">
+    <P4Head title="Traçabilité & Qualité" desc="De la ferme à l'assiette — vendez plus cher aux professionnels." action={<Btn small><I.plus size={15}/>Nouveau lot</Btn>}/>
+    <div style={{display:"grid",gridTemplateColumns:mobile?"1fr 1fr":"repeat(4,1fr)",gap:12,margin:"18px 0"}}>
+      <Stat icon={I.shield} label="Lots tracés" value="128"/>
+      <Stat icon={I.check} label="Certifications" value="2" tone="var(--green)"/>
+      <Stat icon={I.grid} label="QR générés" value="340"/>
+      <Stat icon={I.trend} label="Conformité" value="100%"/>
+    </div>
+    <div style={{background:"var(--surface)",border:"1px solid var(--line)",borderRadius:18,padding:18,boxShadow:"var(--shadow-sm)",marginBottom:16}}>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14}}><strong>Parcours du lot LOT-2406-A</strong><span style={{fontSize:12,color:"var(--ink3)"}}>Poulet de chair · B-023</span></div>
+      <div style={{display:"flex",alignItems:"center"}}>{journey.map((s,i)=>(
+        <React.Fragment key={i}>
+          <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:5}}>
+            <span style={{width:28,height:28,borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",background:i<cur?"var(--green)":i===cur?"var(--blue)":"var(--neutral-bg)",color:i<=cur?"#fff":"var(--ink3)"}}>{i<cur?<I.check size={14}/>:<span style={{fontSize:11,fontWeight:700}}>{i+1}</span>}</span>
+            {!mobile&&<span style={{fontSize:10.5,color:i<=cur?"var(--ink)":"var(--ink3)",fontWeight:600}}>{s}</span>}</div>
+          {i<journey.length-1&&<div style={{flex:1,height:2,background:i<cur?"var(--green)":"var(--line)",margin:"0 4px",marginBottom:mobile?0:18}}/>}
+        </React.Fragment>))}</div>
+    </div>
+    <div style={{background:"var(--surface)",border:"1px solid var(--line)",borderRadius:18,overflow:"hidden",boxShadow:"var(--shadow-sm)"}}>
+      <div style={{padding:"14px 16px",borderBottom:"1px solid var(--line)"}}><strong>Lots tracés</strong></div>
+      {lots.map((l,i)=>(
+        <div key={i} style={{display:"flex",alignItems:"center",gap:13,padding:"12px 16px",borderBottom:i<lots.length-1?"1px solid var(--line)":"none"}}>
+          <div style={{width:38,height:38,borderRadius:9,background:"var(--ink)",color:"#fff",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}><I.grid size={18}/></div>
+          <div style={{flex:1,minWidth:0}}><strong style={{fontSize:13.5}}>{l.id}</strong><div style={{fontSize:11.5,color:"var(--ink3)"}}>{l.p} · {l.b} · {l.q}</div></div>
+          <span style={{background:l.bg,color:l.c,fontSize:11,fontWeight:700,padding:"4px 10px",borderRadius:999}}>{l.st}</span></div>))}
+    </div>
+  </div>);
+}
+
+function ScrLogistique({mobile}){
+  const dv=[{ref:"LIV-204",cli:"Restaurant Le Manguier",zone:"Bastos",ch:"Jean O.",st:"En route",c:"var(--info)",bg:"var(--info-bg)"},
+    {ref:"LIV-203",cli:"Mme Ngono",zone:"Odza",ch:"Marie A.",st:"Livrée",c:"var(--ok)",bg:"var(--ok-bg)"},
+    {ref:"LIV-202",cli:"Hôtel La Falaise",zone:"Bonapriso",ch:"Jean O.",st:"À charger",c:"var(--amber)",bg:"var(--warn-bg)"}];
+  return (<div className="fade">
+    <P4Head title="Logistique & Livraisons" desc="Organisez les tournées et suivez les livraisons." action={<Btn small><I.plus size={15}/>Planifier une tournée</Btn>}/>
+    <div style={{display:"grid",gridTemplateColumns:mobile?"1fr 1fr":"repeat(4,1fr)",gap:12,margin:"18px 0"}}>
+      <Stat icon={I.box} label="Livraisons (jour)" value="14"/>
+      <Stat icon={I.trend} label="En route" value="3" tone="var(--info)"/>
+      <Stat icon={I.users} label="Chauffeurs" value="2"/>
+      <Stat icon={I.pin} label="Zones" value="6"/>
+    </div>
+    <div style={{display:"grid",gridTemplateColumns:mobile?"1fr":"1fr 1.2fr",gap:16}}>
+      <div style={{borderRadius:18,overflow:"hidden",border:"1px solid var(--line)",height:mobile?180:280,position:"relative",background:"linear-gradient(rgba(37,99,235,.05),rgba(37,99,235,.05)),repeating-linear-gradient(0deg,#eef2f7 0 39px,#e2e8f0 39px 40px),repeating-linear-gradient(90deg,#eef2f7 0 39px,#e2e8f0 39px 40px)"}}>
+        {[[60,90],[150,140],[230,80],[110,200]].map((p,i)=><div key={i} style={{position:"absolute",left:p[0],top:p[1],width:30,height:30,background:"var(--blue)",borderRadius:"50% 50% 50% 0",transform:"rotate(-45deg)",boxShadow:"var(--shadow-sm)",display:"grid",placeItems:"center"}}><I.pin size={14} style={{color:"#fff",transform:"rotate(45deg)"}}/></div>)}
+        <span style={{position:"absolute",right:12,top:12,background:"#fff",fontSize:11,fontWeight:600,color:"var(--ink2)",padding:"5px 10px",borderRadius:999,boxShadow:"var(--shadow-sm)",display:"inline-flex",gap:5,alignItems:"center"}}><I.pin size={13}/>Tournée du jour · Yaoundé</span>
+      </div>
+      <div style={{background:"var(--surface)",border:"1px solid var(--line)",borderRadius:18,overflow:"hidden",boxShadow:"var(--shadow-sm)"}}>
+        <div style={{padding:"14px 16px",borderBottom:"1px solid var(--line)"}}><strong>Livraisons du jour</strong></div>
+        {dv.map((d,i)=>(
+          <div key={i} style={{display:"flex",alignItems:"center",gap:12,padding:"12px 16px",borderBottom:i<dv.length-1?"1px solid var(--line)":"none"}}>
+            <Avatar name={d.ch} size={36}/>
+            <div style={{flex:1,minWidth:0}}><div style={{display:"flex",gap:7,alignItems:"center",flexWrap:"wrap"}}><strong style={{fontSize:13.5}}>{d.cli}</strong><span style={{fontSize:11,color:"var(--ink3)"}}>{d.ref}</span></div>
+              <div style={{fontSize:11.5,color:"var(--ink3)"}}><I.pin size={11}/> {d.zone} · {d.ch}</div></div>
+            <span style={{background:d.bg,color:d.c,fontSize:11,fontWeight:700,padding:"4px 10px",borderRadius:999,whiteSpace:"nowrap"}}>{d.st}</span></div>))}
+      </div>
+    </div>
+  </div>);
+}
+
+function ScrAbonnements({mobile}){
+  const plans=[{n:"Panier Œufs",freq:"Hebdomadaire",prix:2800,abo:32,pop:false},{n:"Panier Volaille",freq:"Hebdomadaire",prix:7000,abo:18,pop:true},{n:"Panier Mixte Famille",freq:"Bi-mensuel",prix:12000,abo:8,pop:false}];
+  const subs=[{n:"Restaurant Le Manguier",plan:"Panier Volaille ×3",next:"Lun 30 juin",st:"Actif"},{n:"Famille Onana",plan:"Panier Œufs",next:"Sam 28 juin",st:"Actif"},{n:"Mme Biya",plan:"Panier Mixte",next:"En pause",st:"Pause"}];
+  return (<div className="fade">
+    <P4Head title="Abonnements & Paniers récurrents" desc="Un revenu récurrent et prévisible, livré automatiquement." action={<Btn small><I.plus size={15}/>Nouvelle formule</Btn>}/>
+    <div style={{display:"grid",gridTemplateColumns:mobile?"1fr 1fr":"repeat(4,1fr)",gap:12,margin:"18px 0"}}>
+      <Stat icon={I.users} label="Abonnés actifs" value="58" sub="+6 ce mois"/>
+      <Stat icon={I.coins} label="Revenu récurrent / mois" value="870 000" tone="var(--green)"/>
+      <Stat icon={I.trend} label="Rétention" value="92%"/>
+      <Stat icon={I.receipt} label="Paniers / semaine" value="74"/>
+    </div>
+    <div style={{display:"grid",gridTemplateColumns:mobile?"1fr":"repeat(3,1fr)",gap:14,marginBottom:16}}>
+      {plans.map((p,i)=>(
+        <div key={i} style={{background:"var(--surface)",border:"2px solid "+(p.pop?"var(--blue)":"var(--line)"),borderRadius:18,padding:18,boxShadow:"var(--shadow-sm)",position:"relative"}}>
+          {p.pop&&<span style={{position:"absolute",top:-10,left:18,background:"var(--blue)",color:"#fff",fontSize:10.5,fontWeight:700,padding:"3px 10px",borderRadius:999}}>POPULAIRE</span>}
+          <strong style={{fontSize:15}}>{p.n}</strong><div style={{fontSize:12,color:"var(--ink3)"}}>{p.freq}</div>
+          <div style={{fontSize:24,fontWeight:800,fontFamily:"'Outfit',sans-serif",margin:"10px 0"}}>{p.prix.toLocaleString('fr-FR')}<span style={{fontSize:12,color:"var(--ink3)",fontWeight:500}}> FCFA</span></div>
+          <div style={{fontSize:12.5,color:"var(--ink2)",display:"flex",alignItems:"center",gap:6}}><I.users size={14} style={{color:"var(--blue)"}}/>{p.abo} abonnés</div>
+        </div>))}
+    </div>
+    <div style={{background:"var(--surface)",border:"1px solid var(--line)",borderRadius:18,overflow:"hidden",boxShadow:"var(--shadow-sm)"}}>
+      <div style={{padding:"14px 16px",borderBottom:"1px solid var(--line)"}}><strong>Abonnés</strong></div>
+      {subs.map((s,i)=>(
+        <div key={i} style={{display:"flex",alignItems:"center",gap:12,padding:"12px 16px",borderBottom:i<subs.length-1?"1px solid var(--line)":"none"}}>
+          <Avatar name={s.n} size={38} green/>
+          <div style={{flex:1,minWidth:0}}><strong style={{fontSize:13.5}}>{s.n}</strong><div style={{fontSize:11.5,color:"var(--ink3)"}}>{s.plan} · prochaine livraison {s.next}</div></div>
+          <span style={{background:s.st==="Actif"?"var(--ok-bg)":"var(--warn-bg)",color:s.st==="Actif"?"var(--ok)":"var(--amber)",fontSize:11,fontWeight:700,padding:"4px 10px",borderRadius:999}}>{s.st}</span></div>))}
+    </div>
+  </div>);
+}
+
+function ScrPaie({mobile}){
+  const pay=[{n:"Jean Owona",p:"Ouvrier élevage",net:75000,st:"Payé"},{n:"Marie Abena",p:"Vendeuse",net:65000,st:"Payé"},{n:"Estelle Fouda",p:"Comptable",net:90000,st:"Payé"},{n:"Paul Eto'o",p:"Ouvrier agricole",net:60000,st:"En attente"}];
+  return (<div className="fade">
+    <P4Head title="Paie & Conformité sociale" desc="Bulletins, cotisations CNPS et conformité OHADA." action={<Btn small><I.plus size={15}/>Lancer la paie</Btn>}/>
+    <div style={{display:"grid",gridTemplateColumns:mobile?"1fr 1fr":"repeat(4,1fr)",gap:12,margin:"18px 0"}}>
+      <Stat icon={I.coins} label="Masse salariale" value="290 000" sub="FCFA / mois"/>
+      <Stat icon={I.idcard} label="Bulletins (juin)" value="4"/>
+      <Stat icon={I.shield} label="Cotisations CNPS" value="34 800"/>
+      <Stat icon={I.check} label="Conformité" value="OHADA"/>
+    </div>
+    <div style={{background:"var(--surface)",border:"1px solid var(--line)",borderRadius:18,overflow:"hidden",boxShadow:"var(--shadow-sm)"}}>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"14px 16px",borderBottom:"1px solid var(--line)"}}><strong>Bulletins de juin 2026</strong><span style={{fontSize:12,color:"var(--ink3)"}}>Net à payer</span></div>
+      {pay.map((u,i)=>(
+        <div key={i} style={{display:"flex",alignItems:"center",gap:13,padding:"12px 16px",borderBottom:i<pay.length-1?"1px solid var(--line)":"none"}}>
+          <Avatar name={u.n} size={40}/>
+          <div style={{flex:1,minWidth:0}}><strong style={{fontSize:14}}>{u.n}</strong><div style={{fontSize:12,color:"var(--ink3)"}}>{u.p}</div></div>
+          <span style={{background:u.st==="Payé"?"var(--ok-bg)":"var(--warn-bg)",color:u.st==="Payé"?"var(--ok)":"var(--amber)",fontSize:11,fontWeight:700,padding:"4px 10px",borderRadius:999}}>{u.st}</span>
+          <b style={{fontSize:13.5,minWidth:mobile?0:84,textAlign:"right"}}>{fcfa(u.net)}</b>
+          {!mobile&&<button className="lift hov" style={{border:"1px solid var(--line)",borderRadius:9,padding:"6px 8px",color:"var(--blue)"}}><I.receipt size={15}/></button>}</div>))}
+    </div>
+  </div>);
+}
+
+function ScrFinancement({mobile}){
+  const credits=[{n:"Crédit équipement (couvoir)",org:"Afriland First Bank",rest:850000,tot:1500000,ech:"15 juil."},{n:"Microcrédit campagne maïs",org:"MC² Mfou",rest:120000,tot:300000,ech:"30 août"}];
+  return (<div className="fade">
+    <P4Head title="Financement & Investisseurs" desc="Crédits, subventions et reporting partenaires." action={<Btn small><I.plus size={15}/>Nouveau financement</Btn>}/>
+    <div style={{display:"grid",gridTemplateColumns:mobile?"1fr 1fr":"repeat(4,1fr)",gap:12,margin:"18px 0"}}>
+      <Stat icon={I.wallet} label="Crédits en cours" value="970 000" sub="reste à rembourser" down/>
+      <Stat icon={I.coins} label="Subventions reçues" value="500 000" tone="var(--green)"/>
+      <Stat icon={I.calendar} label="Échéance proche" value="15 j"/>
+      <Stat icon={I.trend} label="Capacité d'emprunt" value="Bonne"/>
+    </div>
+    <div style={{display:"grid",gridTemplateColumns:mobile?"1fr":"1.4fr 1fr",gap:16}}>
+      <div style={{background:"var(--surface)",border:"1px solid var(--line)",borderRadius:18,padding:18,boxShadow:"var(--shadow-sm)"}}>
+        <strong>Crédits en cours</strong>
+        <div style={{marginTop:12,display:"flex",flexDirection:"column",gap:16}}>{credits.map((c,i)=>(
+          <div key={i}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:6}}><div><strong style={{fontSize:13.5}}>{c.n}</strong><div style={{fontSize:11.5,color:"var(--ink3)"}}>{c.org} · échéance {c.ech}</div></div><span style={{fontSize:12.5,fontWeight:700}}>{fcfa(c.rest)}</span></div>
+            <div style={{margin:"8px 0 4px"}}><Progress value={Math.round((1-c.rest/c.tot)*100)} color="var(--green)"/></div>
+            <div style={{fontSize:11,color:"var(--ink3)"}}>Remboursé {Math.round((1-c.rest/c.tot)*100)}% sur {fcfa(c.tot)}</div></div>))}</div>
+      </div>
+      <div style={{background:"var(--surface)",border:"1px solid var(--line)",borderRadius:18,padding:18,boxShadow:"var(--shadow-sm)"}}>
+        <strong>Subventions & dossiers</strong>
+        <div style={{marginTop:12,display:"flex",flexDirection:"column",gap:12}}>
+          <div style={{display:"flex",alignItems:"center",gap:11}}><span style={{width:34,height:34,borderRadius:10,background:"var(--ok-bg)",color:"var(--ok)",display:"flex",alignItems:"center",justifyContent:"center"}}><I.check size={16}/></span><div style={{flex:1}}><div style={{fontSize:13,fontWeight:600}}>PNDP — Appui jeunes agri.</div><div style={{fontSize:11.5,color:"var(--ink3)"}}>500 000 FCFA · reçue</div></div></div>
+          <div style={{display:"flex",alignItems:"center",gap:11}}><span style={{width:34,height:34,borderRadius:10,background:"var(--warn-bg)",color:"var(--amber)",display:"flex",alignItems:"center",justifyContent:"center"}}><I.clock size={16}/></span><div style={{flex:1}}><div style={{fontSize:13,fontWeight:600}}>FONIJA — Extension élevage</div><div style={{fontSize:11.5,color:"var(--ink3)"}}>Dossier en instruction</div></div></div>
+        </div>
+        <div style={{marginTop:14}}><Btn small ghost full><I.chart size={14}/>Rapport investisseurs</Btn></div>
+      </div>
+    </div>
+  </div>);
+}
+
+function ScrIA({mobile}){
+  const reco=[{ic:I.alert,c:"var(--danger)",t:"Risque de mortalité élevé — B-024",d:"Forte chaleur prévue : renforcez l'abreuvement et la ventilation.",tag:"Priorité"},
+    {ic:I.coins,c:"var(--green)",t:"Prix de vente conseillé : 3 600 FCFA/kg",d:"La demande est forte cette semaine (+8% vs marché).",tag:"Opportunité"},
+    {ic:I.leaf,c:"var(--blue)",t:"Optimisation aliment",d:"Passez B-024 en formule finition dès J29 pour gagner ~6% de FCR.",tag:"Conseil"}];
+  return (<div className="fade">
+    <P4Head title="Aide à la décision & IA" desc="Anticipez grâce aux prédictions et recommandations." action={null}/>
+    <div style={{display:"grid",gridTemplateColumns:mobile?"1fr 1fr":"repeat(4,1fr)",gap:12,margin:"18px 0"}}>
+      <Stat icon={I.drop} label="Mortalité prédite (B-024)" value="4,2%" tone="var(--amber)"/>
+      <Stat icon={I.coins} label="Prix conseillé" value="3 600/kg" tone="var(--green)"/>
+      <Stat icon={I.alert} label="Anomalies détectées" value="2"/>
+      <Stat icon={I.trend} label="Fiabilité modèle" value="87%"/>
+    </div>
+    <div style={{display:"flex",flexDirection:"column",gap:12}}>
+      {reco.map((r,i)=>(
+        <div key={i} className="lift hov" style={{background:"var(--surface)",border:"1px solid var(--line)",borderRadius:16,padding:16,display:"flex",gap:13,alignItems:"flex-start",boxShadow:"var(--shadow-sm)"}}>
+          <span style={{width:40,height:40,borderRadius:11,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",background:"var(--blue-50)",color:r.c}}><r.ic size={19}/></span>
+          <div style={{flex:1,minWidth:0}}><div style={{display:"flex",gap:8,alignItems:"center",flexWrap:"wrap"}}><strong style={{fontSize:14}}>{r.t}</strong><span style={{background:"var(--neutral-bg)",color:"var(--ink2)",fontSize:10.5,fontWeight:700,padding:"2px 8px",borderRadius:999}}>{r.tag}</span></div>
+            <div style={{fontSize:12.5,color:"var(--ink2)",marginTop:4,lineHeight:1.5}}>{r.d}</div></div>
+          <button className="hov" style={{color:"var(--blue)",fontSize:12.5,fontWeight:600,whiteSpace:"nowrap",alignSelf:"center"}}>Appliquer</button></div>))}
+    </div>
+  </div>);
+}
+
+function ScrCirculaire({mobile}){
+  const flux=[{ic:I.leaf,t:"Fumier → Compost",d:"1,2 t produites · épandues sur Parcelle A",c:"var(--green)",prog:80},{ic:I.drop,t:"Déchets → Biogaz",d:"Unité en projet (étude en cours)",c:"var(--amber)",prog:20},{ic:I.box,t:"Invendus → Aliment animal",d:"Recyclage des écarts de tri",c:"var(--blue)",prog:60}];
+  return (<div className="fade">
+    <P4Head title="Économie circulaire" desc="Valorisez les déchets et réduisez vos coûts d'intrants." action={null}/>
+    <div style={{display:"grid",gridTemplateColumns:mobile?"1fr 1fr":"repeat(4,1fr)",gap:12,margin:"18px 0"}}>
+      <Stat icon={I.leaf} label="Compost produit" value="1,2 t" tone="var(--green)"/>
+      <Stat icon={I.wifi} label="Énergie solaire" value="65%" sub="de la conso"/>
+      <Stat icon={I.down} label="Coûts d'intrants évités" value="18%" tone="var(--green)"/>
+      <Stat icon={I.trend} label="Bilan carbone" value="−2,4 t"/>
+    </div>
+    <div style={{display:"grid",gridTemplateColumns:mobile?"1fr":"repeat(3,1fr)",gap:14}}>
+      {flux.map((f,i)=>(
+        <div key={i} style={{background:"var(--surface)",border:"1px solid var(--line)",borderRadius:18,padding:16,boxShadow:"var(--shadow-sm)"}}>
+          <span style={{width:44,height:44,borderRadius:13,display:"flex",alignItems:"center",justifyContent:"center",background:"var(--green-50)",color:f.c}}><f.ic size={21}/></span>
+          <div style={{fontWeight:700,fontSize:14.5,marginTop:11}}>{f.t}</div>
+          <div style={{fontSize:12,color:"var(--ink3)",margin:"4px 0 12px",lineHeight:1.45}}>{f.d}</div>
+          <Progress value={f.prog} color={f.c}/>
+        </div>))}
+    </div>
+  </div>);
+}
+
+function ScrMultisites({mobile}){
+  const sites=[{n:"Ferme de Mfou",t:"Site principal · volaille & cultures",ca:"4,2 M",act:6,seed:"farm"},{n:"Site de Soa",t:"Élevage porcin & maraîchage",ca:"1,8 M",act:2,seed:"porc-b"}];
+  const coop=[{n:"Éleveur — M. Atangana",t:"Contrat d'intégration volaille",st:"Actif"},{n:"Éleveur — Mme Fouda",t:"Contrat d'intégration œufs",st:"Actif"},{n:"Producteur — Soa",t:"Approvisionnement maïs",st:"En cours"}];
+  return (<div className="fade">
+    <P4Head title="Multi-sites & Coopérative" desc="Pilotez plusieurs fermes et fédérez des producteurs." action={<Btn small><I.plus size={15}/>Ajouter un site</Btn>}/>
+    <div style={{display:"grid",gridTemplateColumns:mobile?"1fr 1fr":"repeat(4,1fr)",gap:12,margin:"18px 0"}}>
+      <Stat icon={I.layers} label="Sites" value="2"/>
+      <Stat icon={I.users} label="Membres coop." value="8"/>
+      <Stat icon={I.contact} label="Contrats d'intégration" value="4"/>
+      <Stat icon={I.coins} label="CA consolidé" value="6,0 M" tone="var(--green)"/>
+    </div>
+    <div style={{display:"grid",gridTemplateColumns:mobile?"1fr":"1fr 1fr",gap:14,marginBottom:16}}>
+      {sites.map((s,i)=>(
+        <div key={i} className="card-hov hov" style={{background:"var(--surface)",border:"1px solid var(--line)",borderRadius:18,overflow:"hidden",boxShadow:"var(--shadow-sm)"}}>
+          <Photo seed={s.seed} h={120} radius={0}/>
+          <div style={{padding:15}}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}><strong style={{fontSize:15}}>{s.n}</strong><span style={{fontSize:12,fontWeight:700,color:"var(--green)"}}>{s.ca} FCFA</span></div>
+            <div style={{fontSize:12.5,color:"var(--ink3)",marginTop:4}}>{s.t}</div>
+            <div style={{fontSize:11.5,color:"var(--ink2)",marginTop:8,display:"inline-flex",alignItems:"center",gap:5}}><I.layers size={13}/>{s.act} activités actives</div></div>
+        </div>))}
+    </div>
+    <div style={{background:"var(--surface)",border:"1px solid var(--line)",borderRadius:18,overflow:"hidden",boxShadow:"var(--shadow-sm)"}}>
+      <div style={{padding:"14px 16px",borderBottom:"1px solid var(--line)"}}><strong>Coopérative & contrats d'intégration</strong></div>
+      {coop.map((c,i)=>(
+        <div key={i} style={{display:"flex",alignItems:"center",gap:12,padding:"12px 16px",borderBottom:i<coop.length-1?"1px solid var(--line)":"none"}}>
+          <Avatar name={c.n.split("—")[1]||c.n} size={36} green/>
+          <div style={{flex:1,minWidth:0}}><strong style={{fontSize:13.5}}>{c.n}</strong><div style={{fontSize:11.5,color:"var(--ink3)"}}>{c.t}</div></div>
+          <span style={{background:c.st==="Actif"?"var(--ok-bg)":"var(--warn-bg)",color:c.st==="Actif"?"var(--ok)":"var(--amber)",fontSize:11,fontWeight:700,padding:"4px 10px",borderRadius:999}}>{c.st}</span></div>))}
+    </div>
+  </div>);
+}
+
+const P4={Couvoir:ScrCouvoir,Aliment:ScrAliment,Sante:ScrSante,Meteo:ScrMeteo,Tracabilite:ScrTracabilite,Logistique:ScrLogistique,Abonnements:ScrAbonnements,Paie:ScrPaie,Financement:ScrFinancement,IA:ScrIA,Circulaire:ScrCirculaire,Multisites:ScrMultisites};
+
 /* ============================ NAV / ROUTER ============================ */
 const NAV={
   gerant:[["grid","Tableau de bord","Dashboard"],["leaf","Élevage","Elevage"],["coins","Trésorerie","Tresorerie"],["chart","Rapports","Rapports"],["layers","Modules","Modules"],["users","Utilisateurs","Utilisateurs"]],
@@ -683,39 +1878,236 @@ const NAV={
   vendeur:[["store","Caisse","Caisse"],["receipt","Ventes","Ventes"],["box","Produits","Produits"]],
   client:[["store","Boutique","Boutique"],["cart","Panier","Panier"],["receipt","Mes commandes","Commandes"]],
 };
-const SHORT={Dashboard:"Accueil",Tresorerie:"Compta",Utilisateurs:"Équipe",Commandes:"Cmd.",Boutique:"Boutique"};
-const ROLES=[["gerant","Gérant"],["cogerant","Co-gérant"],["vendeur","Vendeur"],["client","Client"]];
-const ROLE_USER={gerant:"Gildas Mebada",cogerant:"Cécilia",vendeur:"Point de vente",client:"Mon compte"};
-const ROLE_NET={gerant:"Gérant",cogerant:"Co-gérante",vendeur:"Caisse",client:"Client"};
+const SHORT={Dashboard:"Accueil",Tresorerie:"Compta",Utilisateurs:"Équipe",Commandes:"Cmd.",Boutique:"Boutique",CRM:"Clients",Ecommerce:"E-com",Formation:"École",BI:"Pilotage",Cacao:"Cacao",Autres:"Autres",RH:"RH",EditDash:"Accueil",Entreprises:"Clients",Licences:"Licences",Branding:"Marque",Logistique:"Livraisons",Paie:"Paie"};
+function getNav(role,act){
+  if(role==="editeur") return [["grid","Tableau de bord","EditDash"],["users","Entreprises clientes","Entreprises"],["tag","Licences & formules","Licences"],["cog","Personnalisation","Branding"]];
+  if(role==="comptable") return [["coins","Trésorerie","Tresorerie"],["idcard","Paie","Paie"],["chart","Rapports","Rapports"]];
+  if(role==="livreur") return [["box","Livraisons","Logistique"],["receipt","Commandes","Commandes"]];
+  if(role==="formateur") return [["book","Formation","Formation"]];
+  if(role==="gerant"){
+    const n=[["grid","Tableau de bord","Dashboard"],["leaf","Élevage","Elevage"]];
+    if(act.includes("M3")) n.push(["pig","Porcs","Porcs"]);
+    if(act.includes("M4")) n.push(["wheat","Cultures","Cultures"]);
+    if(act.includes("M9")) n.push(["bean","Cacao","Cacao"]);
+    if(act.includes("M11")) n.push(["fish","Autres élevages","Autres"]);
+    n.push(["coins","Trésorerie","Tresorerie"]);
+    if(act.includes("M8")) n.push(["contact","Clients & Fourn.","CRM"]);
+    if(act.includes("M10")) n.push(["tag","E-commerce","Ecommerce"]);
+    if(act.includes("M7")) n.push(["idcard","Personnel","RH"]);
+    if(act.includes("M13")) n.push(["book","Formation","Formation"]);
+    n.push(["chart","Rapports","Rapports"]);
+    if(act.includes("M12")) n.push(["pie","Pilotage (BI)","BI"]);
+    EXT_LIST.forEach(e=>{if(act.includes(e.code)) n.push([e.icon,e.label,e.key]);});
+    n.push(["layers","Modules","Modules"],["users","Utilisateurs","Utilisateurs"]);
+    return n;
+  }
+  if(role==="cogerant"){
+    const n=[["clip","Saisie du jour","Saisie"],["leaf","Élevage","Elevage"]];
+    if(act.includes("M3")) n.push(["pig","Porcs","Porcs"]);
+    if(act.includes("M4")) n.push(["wheat","Cultures","Cultures"]);
+    if(act.includes("M9")) n.push(["bean","Cacao","Cacao"]);
+    if(act.includes("M11")) n.push(["fish","Autres","Autres"]);
+    n.push(["cart","Ventes","Ventes"],["box","Stocks","Stocks"]);
+    return n;
+  }
+  return NAV[role];
+}
+const ROLES=[["editeur","Éditeur"],["gerant","Gérant"],["cogerant","Co-gérant"],["comptable","Comptable"],["vendeur","Vendeur"],["livreur","Livreur"],["client","Client"],["formateur","Formateur"]];
+const ROLE_USER={editeur:"Admin Éditeur",gerant:"Gildas Mebada",cogerant:"Cécilia",comptable:"Estelle Fouda",vendeur:"Point de vente",livreur:"Jean Owona",client:"Mon compte",formateur:"Gildas (Formateur)"};
+const ROLE_NET={editeur:"Super-Admin",gerant:"Gérant",cogerant:"Co-gérante",comptable:"Comptable",vendeur:"Caisse",livreur:"Livreur",client:"Client",formateur:"Formateur"};
+
+/* ============================ ESPACE ÉDITEUR (SaaS / Super-Admin) ============================ */
+const TENANTS=[
+  {n:"GICETECHA (vous)",color:"#16A34A",plan:"Entreprise",st:"Actif",c:"var(--ok)",bg:"var(--ok-bg)",users:8,mrr:0},
+  {n:"Ferme Avicole du Wouri",color:"#2563EB",plan:"Pro",st:"Actif",c:"var(--ok)",bg:"var(--ok-bg)",users:5,mrr:25000},
+  {n:"Coopérative Maraîchère Mfou",color:"#7C3AED",plan:"Pro",st:"Actif",c:"var(--ok)",bg:"var(--ok-bg)",users:6,mrr:25000},
+  {n:"Élevage Porcin Bafia",color:"#D97706",plan:"Starter",st:"Essai",c:"var(--amber)",bg:"var(--warn-bg)",users:2,mrr:0},
+  {n:"Pisciculture Sanaga",color:"#E11D48",plan:"Starter",st:"Suspendu",c:"var(--danger)",bg:"var(--danger-bg)",users:3,mrr:0},
+];
+function EditeurDash({mobile,go}){
+  const bars=[35,44,52,60,68,80,92]; const mois=["Jan","Fév","Mar","Avr","Mai","Jun","Jul"];
+  const plans=[["Starter",3,"var(--blue)"],["Pro",4,"var(--green)"],["Entreprise",1,"var(--violet)"],["Essai",4,"var(--amber)"]];
+  const tot=plans.reduce((s,x)=>s+x[1],0);
+  return (
+    <div className="fade">
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:10}}>
+        <div><span style={{background:"var(--blue-50)",color:"var(--blue)",fontSize:10.5,fontWeight:700,padding:"2px 9px",borderRadius:999}}>ESPACE ÉDITEUR</span>
+          <h1 style={{fontSize:26,marginTop:6}}>Tableau de bord</h1><p style={{color:"var(--ink3)",margin:"4px 0 0",fontSize:14}}>Pilotage de la plateforme SaaS multi-entreprises.</p></div>
+        <Btn small onClick={()=>go("Entreprises")}><I.users size={15}/>Voir les clients</Btn>
+      </div>
+      <div style={{display:"grid",gridTemplateColumns:mobile?"1fr 1fr":"repeat(4,1fr)",gap:12,margin:"18px 0"}}>
+        <Stat icon={I.users} label="Entreprises clientes" value="12" sub="+2 ce mois"/>
+        <Stat icon={I.coins} label="Revenu récurrent (MRR)" value={fk(1400000)} tone="var(--green)"/>
+        <Stat icon={I.tag} label="Essais en cours" value="4"/>
+        <Stat icon={I.trend} label="Rétention" value="94%"/>
+      </div>
+      <div style={{display:"grid",gridTemplateColumns:mobile?"1fr":"1.6fr 1fr",gap:16}}>
+        <div style={{background:"var(--surface)",border:"1px solid var(--line)",borderRadius:18,padding:18,boxShadow:"var(--shadow-sm)"}}>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}><strong>Croissance du MRR</strong><span style={{color:"var(--ok)",fontSize:12.5,fontWeight:600,display:"inline-flex",gap:4,alignItems:"center"}}><I.trend size={14}/>+22%</span></div>
+          <div style={{display:"flex",alignItems:"flex-end",gap:mobile?8:16,height:140,marginTop:16}}>
+            {bars.map((b,i)=>(<div key={i} style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:7}}>
+              <div className="hov" style={{width:"100%",height:b+"%",borderRadius:"7px 7px 0 0",background:i===6?"var(--blue)":"var(--blue-100)"}}/>
+              <span style={{fontSize:10.5,color:"var(--ink3)",fontWeight:600}}>{mois[i]}</span></div>))}
+          </div>
+        </div>
+        <div style={{background:"var(--surface)",border:"1px solid var(--line)",borderRadius:18,padding:18,boxShadow:"var(--shadow-sm)"}}>
+          <strong>Répartition par formule</strong>
+          <div style={{marginTop:14,display:"flex",flexDirection:"column",gap:12}}>
+            {plans.map(([l,v,c],i)=>(<div key={i}>
+              <div style={{display:"flex",justifyContent:"space-between",fontSize:12.5,marginBottom:5}}><span style={{color:"var(--ink2)",fontWeight:600}}>{l}</span><b>{v}</b></div>
+              <Progress value={Math.round(v/tot*100)} color={c}/></div>))}
+          </div>
+        </div>
+      </div>
+    </div>);
+}
+function Entreprises({mobile}){
+  return (
+    <div className="fade">
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:10}}>
+        <div><h1 style={{fontSize:26}}>Entreprises clientes</h1><p style={{color:"var(--ink3)",margin:"4px 0 0",fontSize:14}}>Les entreprises (tenants) hébergées sur la plateforme.</p></div>
+        <Btn small><I.plus size={15}/>Inviter une entreprise</Btn>
+      </div>
+      <div style={{display:"grid",gridTemplateColumns:mobile?"1fr 1fr":"repeat(4,1fr)",gap:12,margin:"18px 0"}}>
+        <Stat icon={I.users} label="Total" value="12"/>
+        <Stat icon={I.check} label="Actifs" value="7" tone="var(--green)"/>
+        <Stat icon={I.tag} label="En essai" value="4" tone="var(--amber)"/>
+        <Stat icon={I.alert} label="Suspendus" value="1" tone="var(--danger)"/>
+      </div>
+      <div style={{background:"var(--surface)",border:"1px solid var(--line)",borderRadius:18,overflow:"hidden",boxShadow:"var(--shadow-sm)"}}>
+        <div style={{padding:"14px 16px",borderBottom:"1px solid var(--line)"}}><strong>Annuaire des clients</strong></div>
+        {TENANTS.map((t,i)=>(
+          <div key={i} className="hov" style={{display:"flex",alignItems:"center",gap:12,padding:"12px 16px",borderBottom:i<TENANTS.length-1?"1px solid var(--line)":"none"}}>
+            <span style={{width:36,height:36,borderRadius:10,flexShrink:0,background:t.color,color:"#fff",display:"flex",alignItems:"center",justifyContent:"center",fontWeight:800,fontFamily:"'Outfit',sans-serif"}}>{t.n[0]}</span>
+            <div style={{flex:1,minWidth:0}}><strong style={{fontSize:13.5}}>{t.n}</strong><div style={{fontSize:11.5,color:"var(--ink3)"}}>{t.users} utilisateurs</div></div>
+            {!mobile&&<span style={{background:"var(--blue-50)",color:"var(--blue)",fontSize:11,fontWeight:700,padding:"3px 10px",borderRadius:999}}>{t.plan}</span>}
+            <span style={{background:t.bg,color:t.c,fontSize:11,fontWeight:700,padding:"4px 10px",borderRadius:999}}>{t.st}</span>
+            {!mobile&&<b style={{fontSize:12.5,minWidth:84,textAlign:"right"}}>{t.mrr?fcfa(t.mrr)+"/m":"—"}</b>}
+            <button className="lift hov" style={{border:"1px solid var(--line)",borderRadius:9,padding:"6px 8px",color:"var(--ink3)"}}><I.cog size={15}/></button>
+          </div>))}
+      </div>
+    </div>);
+}
+function LicencesScreen({mobile}){
+  const plans=[
+    {n:"Essai",p:"Gratuit",per:"30 jours",mods:"MVP (volaille + trésorerie)",cl:4,pop:false},
+    {n:"Starter",p:"5 000",per:"FCFA / mois",mods:"MVP + stocks + ventes",cl:3,pop:false},
+    {n:"Pro",p:"15 000",per:"FCFA / mois",mods:"+ diversification + abonnements",cl:4,pop:true},
+    {n:"Entreprise",p:"35 000",per:"FCFA / mois",mods:"Tous les modules (25)",cl:1,pop:false},
+    {n:"Sur-mesure",p:"Sur devis",per:"",mods:"Modules à la carte",cl:0,pop:false},
+  ];
+  return (
+    <div className="fade">
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:10}}>
+        <div><h1 style={{fontSize:26}}>Licences & formules</h1><p style={{color:"var(--ink3)",margin:"4px 0 0",fontSize:14}}>Chaque formule débloque un ensemble de modules.</p></div>
+        <Btn small><I.plus size={15}/>Nouvelle formule</Btn>
+      </div>
+      <div style={{display:"grid",gridTemplateColumns:mobile?"1fr":"repeat(auto-fill,minmax(210px,1fr))",gap:14,marginTop:18}}>
+        {plans.map((p,i)=>(
+          <div key={i} style={{background:"var(--surface)",border:"2px solid "+(p.pop?"var(--blue)":"var(--line)"),borderRadius:18,padding:18,boxShadow:"var(--shadow-sm)",position:"relative"}}>
+            {p.pop&&<span style={{position:"absolute",top:-10,left:18,background:"var(--blue)",color:"#fff",fontSize:10.5,fontWeight:700,padding:"3px 10px",borderRadius:999}}>POPULAIRE</span>}
+            <strong style={{fontSize:16}}>{p.n}</strong>
+            <div style={{fontSize:22,fontWeight:800,fontFamily:"'Outfit',sans-serif",margin:"8px 0 0"}}>{p.p}</div>
+            <div style={{fontSize:11.5,color:"var(--ink3)"}}>{p.per}</div>
+            <div style={{fontSize:12.5,color:"var(--ink2)",margin:"12px 0",minHeight:34}}>{p.mods}</div>
+            <div style={{borderTop:"1px solid var(--line)",paddingTop:10,fontSize:12,color:"var(--ink3)",display:"flex",alignItems:"center",gap:5}}><I.users size={13}/>{p.cl} client(s)</div>
+          </div>))}
+      </div>
+    </div>);
+}
+function Branding({mobile,chrome}){
+  const {brand,setBrand,theme,setTheme,cur,setCur,appName,setAppName}=chrome;
+  const Tg=({on,onClick})=>(<button onClick={onClick} style={{width:46,height:27,borderRadius:999,background:on?"var(--blue)":"var(--neutral-bg)",position:"relative",flexShrink:0}}><span style={{position:"absolute",top:3,left:on?22:3,width:21,height:21,borderRadius:"50%",background:"#fff",transition:".2s",boxShadow:"0 1px 3px rgba(0,0,0,.3)"}}/></button>);
+  return (
+    <div className="fade">
+      <h1 style={{fontSize:26}}>Personnalisation (marque blanche)</h1>
+      <p style={{color:"var(--ink3)",margin:"4px 0 16px",fontSize:14}}>Adaptez l'apparence à la marque de chaque entreprise — l'aperçu se met à jour en direct.</p>
+      <div style={{display:"grid",gridTemplateColumns:mobile?"1fr":"1fr 1fr",gap:16}}>
+        <div style={{background:"var(--surface)",border:"1px solid var(--line)",borderRadius:18,padding:18,boxShadow:"var(--shadow-sm)"}}>
+          <label style={{fontSize:12.5,fontWeight:600,color:"var(--ink2)"}}>Nom de l'application</label>
+          <div style={{marginTop:6,marginBottom:16,border:"1px solid var(--line)",borderRadius:11,padding:"10px 12px",background:"var(--bg)"}}>
+            <input value={appName} onChange={e=>setAppName(e.target.value)} style={{width:"100%",border:"none",outline:"none",background:"transparent",fontSize:14,color:"var(--ink)",fontFamily:"Inter"}}/></div>
+          <label style={{fontSize:12.5,fontWeight:600,color:"var(--ink2)"}}>Logo</label>
+          <div style={{marginTop:6,marginBottom:16,border:"2px dashed var(--line)",borderRadius:12,padding:"16px",textAlign:"center",color:"var(--ink3)",fontSize:12.5}}><I.image size={22}/><div style={{marginTop:4}}>Glissez un logo (PNG/SVG)</div></div>
+          <label style={{fontSize:12.5,fontWeight:600,color:"var(--ink2)"}}>Couleur principale</label>
+          <div style={{display:"flex",gap:10,margin:"8px 0 16px",flexWrap:"wrap"}}>
+            {Object.keys(BRANDS).map(k=>(
+              <button key={k} onClick={()=>setBrand(k)} title={k} style={{width:34,height:34,borderRadius:"50%",background:BRANDS[k][0],border:brand===k?"3px solid var(--ink)":"3px solid transparent",cursor:"pointer"}}/>))}
+          </div>
+          <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"10px 0",borderTop:"1px solid var(--line)"}}>
+            <span style={{fontSize:13.5,fontWeight:600,display:"inline-flex",alignItems:"center",gap:8}}><I.cog size={16} style={{color:"var(--ink3)"}}/>Mode sombre</span><Tg on={theme==="dark"} onClick={()=>setTheme(theme==="dark"?"light":"dark")}/></div>
+          <div style={{paddingTop:12,borderTop:"1px solid var(--line)"}}>
+            <span style={{fontSize:13.5,fontWeight:600}}>Devise</span>
+            <div style={{display:"flex",gap:7,marginTop:8}}>{["FCFA","EUR","USD"].map(c=>(
+              <button key={c} onClick={()=>setCur(c)} style={{padding:"7px 14px",borderRadius:999,fontSize:12.5,fontWeight:600,border:"1px solid "+(cur===c?"var(--blue)":"var(--line)"),background:cur===c?"var(--blue)":"var(--surface)",color:cur===c?"#fff":"var(--ink2)"}}>{c}</button>))}</div>
+          </div>
+        </div>
+        <div style={{background:"var(--surface)",border:"1px solid var(--line)",borderRadius:18,padding:18,boxShadow:"var(--shadow-sm)"}}>
+          <div style={{fontSize:11.5,fontWeight:700,color:"var(--ink3)",textTransform:"uppercase",letterSpacing:.5,marginBottom:12}}>Aperçu en direct</div>
+          <div style={{border:"1px solid var(--line)",borderRadius:14,overflow:"hidden"}}>
+            <div style={{background:"var(--blue)",color:"#fff",padding:"12px 14px",display:"flex",alignItems:"center",gap:9}}>
+              <span style={{width:28,height:28,borderRadius:8,background:"rgba(255,255,255,.25)",display:"flex",alignItems:"center",justifyContent:"center"}}><I.leaf size={16}/></span>
+              <strong style={{fontFamily:"'Outfit',sans-serif"}}>{appName||"Mon App"}</strong></div>
+            <div style={{padding:14,background:"var(--bg)"}}>
+              <div style={{background:"var(--surface)",border:"1px solid var(--line)",borderRadius:12,padding:14}}>
+                <span style={{color:"var(--blue)",background:"var(--blue-50)",borderRadius:10,padding:8,display:"inline-flex"}}><I.coins size={18}/></span>
+                <div style={{fontSize:20,fontWeight:800,fontFamily:"'Outfit',sans-serif",marginTop:8,color:"var(--ink)"}}>{fcfa(486000)}</div>
+                <div style={{fontSize:12,color:"var(--ink3)"}}>Revenus du mois</div>
+                <div style={{marginTop:12,display:"flex",gap:8}}><Btn small>Action</Btn><Btn small ghost>Détails</Btn></div>
+              </div>
+            </div>
+          </div>
+          <p style={{fontSize:11.5,color:"var(--ink3)",marginTop:12,lineHeight:1.5}}>Chaque entreprise cliente voit sa propre marque (nom, logo, couleur), son thème et sa devise. Essayez de changer la couleur ou d'activer le mode sombre ci-contre.</p>
+        </div>
+      </div>
+    </div>);
+}
 
 function renderScreen(role,screen,ctx){
-  const {selected,setSelected,go,mobile}=ctx;
+  const {selected,setSelected,go,mobile,openModal,activeMods,activate,deactivate,chrome}=ctx;
+  if(screen==="EditDash") return <EditeurDash mobile={mobile} go={go}/>;
+  if(screen==="Entreprises") return <Entreprises mobile={mobile}/>;
+  if(screen==="Licences") return <LicencesScreen mobile={mobile}/>;
+  if(screen==="Branding") return <Branding mobile={mobile} chrome={chrome}/>;
+  if(screen==="Tresorerie") return <Tresorerie mobile={mobile} openModal={openModal}/>;
+  if(screen==="Rapports") return <Rapports mobile={mobile}/>;
+  if(screen==="Commandes") return <Commandes mobile={mobile}/>;
   if(screen==="Notifications") return <Notifications mobile={mobile}/>;
   if(screen==="Parametres") return <Parametres mobile={mobile} role={role}/>;
+  if(screen==="Porcs") return <Porcs mobile={mobile} openModal={openModal}/>;
+  if(screen==="Cultures") return <Cultures mobile={mobile} openModal={openModal}/>;
+  if(screen==="Cacao") return <Cacao mobile={mobile} openModal={openModal}/>;
+  if(screen==="Autres") return <Autres mobile={mobile} openModal={openModal}/>;
+  if(screen==="RH") return <RH mobile={mobile} openModal={openModal}/>;
+  if(screen==="CRM") return <CRM mobile={mobile}/>;
+  if(screen==="Ecommerce") return <Ecommerce mobile={mobile}/>;
+  if(screen==="BI") return <BI mobile={mobile}/>;
+  if(screen==="Formation") return <Formation mobile={mobile} openModal={openModal}/>;
+  if(EXT[screen]){const C=P4[screen]; return C?<C mobile={mobile}/>:<ModuleScreen cfg={EXT[screen]} mobile={mobile}/>;}
   if(role==="gerant"){
-    if(screen==="Dashboard") return <Dashboard mobile={mobile} go={go}/>;
-    if(screen==="Elevage") return <ElevageList mobile={mobile} onOpen={b=>{setSelected(b);go("__bande");}}/>;
-    if(screen==="__bande") return <BandeDetail mobile={mobile} b={selected} onBack={()=>go("Elevage")}/>;
-    if(screen==="Tresorerie") return <Tresorerie mobile={mobile}/>;
+    if(screen==="Dashboard") return <Dashboard mobile={mobile} go={go} act={activeMods}/>;
+    if(screen==="Elevage") return <ElevageList mobile={mobile} openModal={openModal} onOpen={b=>{setSelected(b);go("__bande");}}/>;
+    if(screen==="__bande") return <BandeDetail mobile={mobile} b={selected} openModal={openModal} onBack={()=>go("Elevage")}/>;
+    if(screen==="Tresorerie") return <Tresorerie mobile={mobile} openModal={openModal}/>;
     if(screen==="Rapports") return <Rapports mobile={mobile}/>;
-    if(screen==="Modules") return <Modules mobile={mobile}/>;
+    if(screen==="Modules") return <Modules mobile={mobile} active={activeMods} onActivate={activate} onDeactivate={deactivate}/>;
     if(screen==="Utilisateurs") return <Utilisateurs mobile={mobile}/>;
   }
   if(role==="cogerant"){
-    if(screen==="Saisie") return <Saisie mobile={mobile}/>;
-    if(screen==="Elevage") return <ElevageList mobile={mobile} onOpen={b=>{setSelected(b);go("__bande");}}/>;
-    if(screen==="__bande") return <BandeDetail mobile={mobile} b={selected} onBack={()=>go("Elevage")}/>;
-    if(screen==="Ventes") return <Ventes mobile={mobile}/>;
+    if(screen==="Saisie") return <Saisie mobile={mobile} openModal={openModal}/>;
+    if(screen==="Elevage") return <ElevageList mobile={mobile} openModal={openModal} onOpen={b=>{setSelected(b);go("__bande");}}/>;
+    if(screen==="__bande") return <BandeDetail mobile={mobile} b={selected} openModal={openModal} onBack={()=>go("Elevage")}/>;
+    if(screen==="Ventes") return <Ventes mobile={mobile} openModal={openModal}/>;
     if(screen==="Stocks") return <Stocks mobile={mobile}/>;
   }
   if(role==="vendeur"){
     if(screen==="Caisse") return <Caisse mobile={mobile}/>;
-    if(screen==="Ventes") return <Ventes mobile={mobile}/>;
+    if(screen==="Ventes") return <Ventes mobile={mobile} openModal={openModal}/>;
     if(screen==="Produits") return <Boutique mobile={mobile} go={go}/>;
   }
   if(role==="client"){
     if(screen==="Boutique") return <Boutique mobile={mobile} go={go}/>;
-    if(screen==="Panier") return <Panier mobile={mobile}/>;
+    if(screen==="Panier") return <Panier mobile={mobile} openModal={openModal}/>;
     if(screen==="Commandes") return <Commandes mobile={mobile}/>;
   }
   return <div style={{padding:40,textAlign:"center",color:"var(--ink3)"}}>Écran « {screen} »</div>;
@@ -728,7 +2120,7 @@ function Brand({size=17,light}){return (
     <div><div style={{fontWeight:800,fontSize:size,fontFamily:"'Outfit',sans-serif",color:light?"#fff":"var(--ink)"}}>GICE<span style={{color:"var(--green)"}}>TECHA</span></div></div>
   </div>);}
 
-function Sidebar({role,screen,go}){
+function Sidebar({role,screen,go,nav}){
   return (
     <aside style={{width:248,background:"var(--slate)",color:"#fff",minHeight:"100%",padding:"22px 16px",display:"flex",flexDirection:"column",flexShrink:0}}>
       <div style={{display:"flex",alignItems:"center",gap:10,padding:"0 8px 8px"}}>
@@ -737,8 +2129,8 @@ function Sidebar({role,screen,go}){
         <div style={{fontSize:10,color:"#94a3b8"}}>{ROLE_NET[role]}</div></div>
       </div>
       <div style={{fontSize:10.5,color:"#64748b",fontWeight:700,letterSpacing:.5,padding:"14px 10px 8px"}}>MODULES</div>
-      <nav style={{display:"flex",flexDirection:"column",gap:3,flex:1}}>
-        {NAV[role].map(([ic,label,key])=>{const act=screen===key||(screen.startsWith("__")&&key==="Elevage");
+      <nav style={{display:"flex",flexDirection:"column",gap:3,flex:1,overflowY:"auto",minHeight:0}}>
+        {nav.map(([ic,label,key])=>{const act=screen===key||(screen.startsWith("__")&&key==="Elevage");
           return <button key={key} onClick={()=>go(key)} className="nav-it hov" style={{display:"flex",alignItems:"center",gap:11,padding:"11px 12px",borderRadius:12,background:act?"var(--blue)":"transparent",color:act?"#fff":"#cbd5e1",fontWeight:act?600:500,fontSize:13.5,textAlign:"left"}}>
             {React.createElement(I[ic],{size:18})}{label}</button>;})}
       </nav>
@@ -749,10 +2141,10 @@ function Sidebar({role,screen,go}){
     </aside>);
 }
 
-function DesktopLayout({role,screen,go,body,onLogout}){
+function DesktopLayout({role,screen,go,body,onLogout,nav}){
   return (
     <div style={{display:"flex",minHeight:600,border:"1px solid var(--line)",borderRadius:24,overflow:"hidden",background:"var(--bg)",boxShadow:"var(--shadow)"}}>
-      <Sidebar role={role} screen={screen} go={go}/>
+      <Sidebar role={role} screen={screen} go={go} nav={nav}/>
       <div style={{flex:1,minWidth:0,display:"flex",flexDirection:"column"}}>
         <header style={{background:"var(--surface)",borderBottom:"1px solid var(--line)",padding:"12px 22px",display:"flex",alignItems:"center",gap:14}}>
           <div style={{display:"flex",alignItems:"center",gap:9,flex:1,maxWidth:360,background:"var(--bg)",border:"1px solid var(--line)",borderRadius:999,padding:"9px 14px",color:"var(--ink3)"}}>
@@ -767,11 +2159,16 @@ function DesktopLayout({role,screen,go,body,onLogout}){
     </div>);
 }
 
-function MobileLayout({role,screen,go,body,onLogout}){
-  const items=NAV[role];
+function MobileLayout({role,screen,go,body,onLogout,nav}){
+  const items=nav;
+  const [more,setMore]=useState(false);
+  const overflow=items.length>5;
+  const visible=overflow?items.slice(0,4):items;
+  const isAct=key=>screen===key||(screen.startsWith("__")&&key==="Elevage");
+  const extraActive=overflow&&items.slice(4).some(([,,k])=>isAct(k));
   return (
     <div style={{display:"flex",justifyContent:"center"}}>
-      <div className="phone-shell" style={{width:390,maxWidth:"100%",background:"var(--bg)",borderRadius:38,border:"9px solid #0f172a",overflow:"hidden",display:"flex",flexDirection:"column",height:780}}>
+      <div className="phone-shell" style={{width:390,maxWidth:"100%",background:"var(--bg)",borderRadius:38,border:"9px solid #0f172a",overflow:"hidden",display:"flex",flexDirection:"column",height:780,position:"relative"}}>
         <div style={{background:"#0f172a",height:24,display:"flex",justifyContent:"center"}}><div style={{width:120,height:18,background:"#0f172a",borderRadius:"0 0 14px 14px"}}/></div>
         <header style={{background:"var(--surface)",borderBottom:"1px solid var(--line)",padding:"12px 16px",display:"flex",alignItems:"center",gap:10}}>
           <span style={{width:30,height:30,borderRadius:9,background:"linear-gradient(135deg,#15803D,#16A34A)",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff"}}><I.leaf size={18}/></span>
@@ -782,10 +2179,26 @@ function MobileLayout({role,screen,go,body,onLogout}){
         </header>
         <main style={{flex:1,overflow:"auto",padding:16}}>{body}</main>
         <nav style={{background:"var(--surface)",borderTop:"1px solid var(--line)",display:"flex",justifyContent:"space-around",padding:"8px 2px 14px"}}>
-          {items.map(([ic,label,key])=>{const act=screen===key||(screen.startsWith("__")&&key==="Elevage");
+          {visible.map(([ic,label,key])=>{const act=isAct(key);
             return <button key={key} onClick={()=>go(key)} style={{flex:1,minWidth:0,display:"flex",flexDirection:"column",alignItems:"center",gap:3,padding:"4px 0",color:act?"var(--blue)":"var(--ink3)"}}>
               {React.createElement(I[ic],{size:20})}<span style={{fontSize:9,fontWeight:act?700:500,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis",maxWidth:"100%"}}>{SHORT[key]||label.split(" ")[0]}</span></button>;})}
+          {overflow&&<button onClick={()=>setMore(true)} style={{flex:1,minWidth:0,display:"flex",flexDirection:"column",alignItems:"center",gap:3,padding:"4px 0",color:extraActive?"var(--blue)":"var(--ink3)"}}>
+            <I.grid size={20}/><span style={{fontSize:9,fontWeight:extraActive?700:500}}>Plus</span></button>}
         </nav>
+
+        {more&&(
+          <div onClick={()=>setMore(false)} style={{position:"absolute",inset:0,zIndex:40,background:"rgba(15,23,42,.5)",backdropFilter:"blur(2px)",display:"flex",alignItems:"flex-end"}}>
+            <div onClick={e=>e.stopPropagation()} className="pop" style={{width:"100%",background:"var(--surface)",borderRadius:"22px 22px 0 0",padding:"12px 16px 22px",maxHeight:"72%",overflow:"auto"}}>
+              <div style={{width:42,height:5,borderRadius:999,background:"var(--line)",margin:"0 auto 12px"}}/>
+              <div style={{fontSize:13,fontWeight:700,color:"var(--ink)",margin:"0 2px 12px"}}>Tous les modules</div>
+              <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:10}}>
+                {items.map(([ic,label,key])=>{const act=isAct(key);
+                  return <button key={key} onClick={()=>{go(key);setMore(false);}} className="press" style={{display:"flex",flexDirection:"column",alignItems:"center",gap:7,padding:"14px 6px",borderRadius:14,border:"1px solid "+(act?"var(--blue)":"var(--line)"),background:act?"var(--blue-50)":"var(--surface)"}}>
+                    <span style={{color:act?"var(--blue)":"var(--ink2)"}}>{React.createElement(I[ic],{size:22})}</span>
+                    <span style={{fontSize:10.5,fontWeight:600,color:"var(--ink2)",textAlign:"center",lineHeight:1.2}}>{label}</span></button>;})}
+              </div>
+            </div>
+          </div>)}
       </div>
     </div>);
 }
@@ -801,7 +2214,7 @@ function Login({onLogin}){
         <input defaultValue={value} type={pwd?"password":"text"} style={{flex:1,minWidth:0,border:"none",outline:"none",background:"transparent",fontSize:14,color:"var(--ink)",fontFamily:"Inter"}}/>
       </div>
     </div>);
-  const roles={gerant:{l:"Gérant",ic:I.grid,d:"Pilotage global"},cogerant:{l:"Co-gérant",ic:I.clip,d:"Saisie & ventes"},vendeur:{l:"Vendeur",ic:I.store,d:"Caisse"},client:{l:"Client",ic:I.cart,d:"Boutique"}};
+  const roles={editeur:{l:"Éditeur",ic:I.cog,d:"Super-Admin SaaS"},gerant:{l:"Gérant",ic:I.grid,d:"Pilotage global"},cogerant:{l:"Co-gérant",ic:I.clip,d:"Saisie & ventes"},comptable:{l:"Comptable",ic:I.coins,d:"Finance & paie"},vendeur:{l:"Vendeur",ic:I.store,d:"Caisse"},livreur:{l:"Livreur",ic:I.box,d:"Livraisons"},client:{l:"Client",ic:I.cart,d:"Boutique"},formateur:{l:"Formateur",ic:I.book,d:"École"}};
   return (
     <div style={{minHeight:"100vh",display:"flex",alignItems:"center",justifyContent:"center",background:"radial-gradient(circle at 30% 15%, #1e293b, #0f172a 72%)",padding:"30px 16px"}}>
       <div className="login-grid" style={{width:"100%",maxWidth:940,display:"grid",gridTemplateColumns:"1fr 1fr",borderRadius:24,overflow:"hidden",boxShadow:"var(--shadow)",background:"var(--surface)"}}>
@@ -811,7 +2224,7 @@ function Login({onLogin}){
             <h1 style={{fontSize:29,lineHeight:1.18,color:"#fff"}}>Pilotez toute votre exploitation, du poulailler à la vente.</h1>
             <p style={{opacity:.92,marginTop:14,fontSize:14.5,lineHeight:1.6}}>Élevage, trésorerie, stocks et boutique — un seul outil, même hors-ligne.</p>
             <div style={{display:"flex",gap:22,marginTop:26}}>
-              {[["13","modules"],["20 ans","de vision"],["100%","hors-ligne"]].map((s,i)=>(
+              {[["25","modules"],["20 ans","de vision"],["100%","hors-ligne"]].map((s,i)=>(
                 <div key={i}><div style={{fontSize:22,fontWeight:800,fontFamily:"'Outfit',sans-serif"}}>{s[0]}</div><div style={{fontSize:11.5,opacity:.85}}>{s[1]}</div></div>))}
             </div>
           </div>
@@ -824,7 +2237,7 @@ function Login({onLogin}){
           <Field label="Mot de passe" icon={I.coins} value="motdepasse" pwd/>
           <div style={{fontSize:12.5,fontWeight:600,color:"var(--ink2)",margin:"6px 0 8px"}}>Se connecter en tant que</div>
           <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:18}}>
-            {ROLES.map(([k])=>{const r=roles[k];const act=role===k;
+            {ROLES.map(([k])=>{const r=roles[k]||{l:k,ic:I.user,d:""};const act=role===k;
               return <button key={k} onClick={()=>setRole(k)} className="hov" style={{display:"flex",alignItems:"center",gap:9,textAlign:"left",padding:"10px 12px",borderRadius:12,border:"1.5px solid "+(act?"var(--blue)":"var(--line)"),background:act?"var(--blue-50)":"var(--surface)"}}>
                 <span style={{width:32,height:32,borderRadius:9,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",background:act?"var(--blue)":"var(--neutral-bg)",color:act?"#fff":"var(--ink3)"}}>{React.createElement(r.ic,{size:17})}</span>
                 <span style={{minWidth:0}}><span style={{display:"block",fontSize:13,fontWeight:700,color:"var(--ink)"}}>{r.l}</span><span style={{fontSize:11,color:"var(--ink3)"}}>{r.d}</span></span>
@@ -844,32 +2257,57 @@ function App(){
   const [role,setRole]=useState("gerant");
   const [screen,setScreen]=useState("Dashboard");
   const [selected,setSelected]=useState(BANDES[0]);
-  const defScreen=r=>NAV[r][0][2];
+  const [modal,setModal]=useState(null);
+  const [toast,setToast]=useState("");
+  const [activeMods,setActiveMods]=useState(["M1","M2"]);
+  const [theme,setTheme]=useState("light");
+  const [brand,setBrand]=useState("blue");
+  const [cur,setCur]=useState("FCFA");
+  const [appName,setAppName]=useState("GICETECHA");
+  const showToast=m=>{setToast(m);setTimeout(()=>setToast(""),2400);};
+  const activate=(codes,label)=>{setActiveMods(a=>[...new Set([...a,...[].concat(codes)])]);showToast(label||"Module activé ✓");};
+  const deactivate=code=>{setActiveMods(a=>a.filter(c=>c!==code));showToast("Module désactivé");};
+  const defScreen=r=>getNav(r,activeMods)[0][2];
   const switchRole=r=>{setRole(r);setScreen(defScreen(r));};
   const go=s=>setScreen(s);
-  if(!auth) return <Login onLogin={r=>{setRole(r);setScreen(defScreen(r));setAuth(true);}}/>;
+  _CUR=CURRENCIES[cur]||CURRENCIES.FCFA;
+  const br=BRANDS[brand]||BRANDS.blue;
+  const themeVars={...THEMES[theme],"--blue":br[0],"--blue-700":br[1],"--blue-bright":br[2]};
+  const chrome={theme,setTheme,brand,setBrand,cur,setCur,appName,setAppName};
+  if(!auth) return <div style={themeVars}><Login onLogin={r=>{setRole(r);setScreen(defScreen(r));setAuth(true);}}/></div>;
   const mobile=mode==="mobile";
-  const body=renderScreen(role,screen,{selected,setSelected,go,mobile});
+  const navItems=getNav(role,activeMods);
+  const body=renderScreen(role,screen,{selected,setSelected,go,mobile,openModal:setModal,activeMods,activate,deactivate,chrome});
   const Layout=mobile?MobileLayout:DesktopLayout;
   return (
-    <div style={{minHeight:"100vh"}}>
-      <div style={{background:"var(--slate)",color:"#fff",padding:"14px 20px",display:"flex",alignItems:"center",gap:16,flexWrap:"wrap",position:"sticky",top:0,zIndex:50}}>
+    <div style={{minHeight:"100vh",background:"var(--bg)",...themeVars}}>
+      <div style={{background:"var(--slate)",color:"#fff",padding:"14px 20px",display:"flex",alignItems:"center",gap:12,flexWrap:"wrap",position:"sticky",top:0,zIndex:50}}>
         <div style={{display:"flex",alignItems:"center",gap:10,marginRight:"auto"}}>
           <span style={{width:34,height:34,borderRadius:10,background:"linear-gradient(135deg,#15803D,#16A34A)",display:"flex",alignItems:"center",justifyContent:"center"}}><I.leaf size={20}/></span>
-          <div><div style={{fontWeight:800,fontSize:15,fontFamily:"'Outfit',sans-serif"}}>Maquette — GICETECHA</div>
-          <div style={{fontSize:11,color:"#94a3b8"}}>Agropastoral & Agro-industriel · MVP · Cameroun</div></div>
+          <div><div style={{fontWeight:800,fontSize:15,fontFamily:"'Outfit',sans-serif"}}>Maquette — {appName}</div>
+          <div style={{fontSize:11,color:"#94a3b8"}}>SaaS agropastoral · multi-entreprises</div></div>
         </div>
-        <div style={{display:"flex",gap:4,background:"#1e293b",padding:4,borderRadius:999}}>
-          {ROLES.map(([k,l])=><button key={k} onClick={()=>switchRole(k)} style={{padding:"7px 13px",borderRadius:999,fontSize:12,fontWeight:600,background:role===k?"var(--blue)":"transparent",color:role===k?"#fff":"#cbd5e1"}}>{l}</button>)}
+        <div style={{display:"flex",gap:3,background:"#1e293b",padding:4,borderRadius:999,flexWrap:"wrap"}}>
+          {ROLES.map(([k,l])=><button key={k} onClick={()=>switchRole(k)} style={{padding:"6px 11px",borderRadius:999,fontSize:11.5,fontWeight:600,background:role===k?"var(--blue)":"transparent",color:role===k?"#fff":"#cbd5e1"}}>{l}</button>)}
         </div>
-        <div style={{display:"flex",gap:4,background:"#1e293b",padding:4,borderRadius:999}}>
-          {[["desktop","🖥  Desktop"],["mobile","📱  Mobile"]].map(([k,l])=><button key={k} onClick={()=>setMode(k)} style={{padding:"7px 13px",borderRadius:999,fontSize:12,fontWeight:600,background:mode===k?"#fff":"transparent",color:mode===k?"var(--slate)":"#cbd5e1"}}>{l}</button>)}
+        <div style={{display:"flex",gap:3,background:"#1e293b",padding:4,borderRadius:999}}>
+          {[["light","☀"],["dark","🌙"]].map(([k,l])=><button key={k} onClick={()=>setTheme(k)} title={k==="dark"?"Mode sombre":"Mode clair"} style={{padding:"6px 11px",borderRadius:999,fontSize:12.5,fontWeight:600,background:theme===k?"#fff":"transparent",color:theme===k?"var(--slate)":"#cbd5e1"}}>{l}</button>)}
+        </div>
+        <div style={{display:"flex",gap:3,background:"#1e293b",padding:4,borderRadius:999}}>
+          {["FCFA","EUR","USD"].map(c=><button key={c} onClick={()=>setCur(c)} style={{padding:"6px 10px",borderRadius:999,fontSize:11,fontWeight:600,background:cur===c?"var(--blue)":"transparent",color:cur===c?"#fff":"#cbd5e1"}}>{c}</button>)}
+        </div>
+        <div style={{display:"flex",gap:3,background:"#1e293b",padding:4,borderRadius:999}}>
+          {[["desktop","🖥"],["mobile","📱"]].map(([k,l])=><button key={k} onClick={()=>setMode(k)} title={k} style={{padding:"6px 11px",borderRadius:999,fontSize:12.5,fontWeight:600,background:mode===k?"#fff":"transparent",color:mode===k?"var(--slate)":"#cbd5e1"}}>{l}</button>)}
         </div>
       </div>
       <div style={{maxWidth:1240,margin:"0 auto",padding:mobile?"24px 14px 50px":"26px 22px 60px"}}>
-        <Layout role={role} screen={screen} go={go} body={body} onLogout={()=>setAuth(false)}/>
-        <p style={{textAlign:"center",color:"var(--ink3)",fontSize:12,marginTop:20}}>Prototype interactif — changez de rôle, basculez Desktop / Mobile, ouvrez une bande ou la caisse.</p>
+        <Layout role={role} screen={screen} go={go} body={body} nav={navItems} onLogout={()=>setAuth(false)}/>
+        <p style={{textAlign:"center",color:"var(--ink3)",fontSize:12,marginTop:20}}>Prototype interactif — changez de rôle, basculez Desktop / Mobile, ouvrez une bande, testez les boutons « + » et le paiement.</p>
       </div>
+      {modal&&(modal==="paiement"
+        ? <PaymentModal mobile={mobile} close={()=>setModal(null)}/>
+        : <FormModal id={modal} mobile={mobile} close={()=>setModal(null)} onSaved={m=>{setModal(null);showToast(m);}}/>)}
+      {toast&&<div className="pop" style={{position:"fixed",left:"50%",bottom:28,transform:"translateX(-50%)",zIndex:200,background:"var(--slate)",color:"#fff",padding:"12px 20px",borderRadius:999,fontSize:13.5,fontWeight:600,display:"flex",alignItems:"center",gap:8,boxShadow:"var(--shadow)"}}><I.check size={17} style={{color:"#4ade80"}}/>{toast}</div>}
     </div>);
 }
 ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
